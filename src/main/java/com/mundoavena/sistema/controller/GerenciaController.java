@@ -1,0 +1,15 @@
+package com.mundoavena.sistema.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/gerencia")
+public class GerenciaController {
+
+    @GetMapping("/dashboard")
+    public String dashboard() {
+        return "gerencia/dashboard";
+    }
+}

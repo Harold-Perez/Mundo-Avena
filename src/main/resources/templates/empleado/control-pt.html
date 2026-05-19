@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Control Diario de Producción PT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f0e8; }
+        .navbar { background-color: #2d5a27; }
+        .btn-guardar { background-color: #2d5a27; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: 600; }
+        .btn-guardar:hover { background-color: #1e3d1a; color: white; }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
+        .total-field { background-color: #f0f7ee !important; font-weight: 600; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark px-4 py-3">
+    <span class="navbar-brand fw-bold">🌾 Mundo Avena</span>
+    <a href="/empleado/dashboard" class="btn btn-outline-light btn-sm">← Volver</a>
+</nav>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-4">🏭 Control Diario de Producción de Producto Terminado</h4>
+
+    <form th:action="@{/empleado/control-pt}" method="post">
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">Información General</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Producto</label>
+                    <input type="text" class="form-control" name="producto"
+                           placeholder="Ej: Hojuela de Avena Nutremas 600g x 40 unidades" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha</label>
+                    <input type="date" class="form-control" name="fecha" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha Vencimiento</label>
+                    <input type="date" class="form-control" name="fechaVencimiento">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Lote</label>
+                    <input type="text" class="form-control" name="lote" placeholder="Ej: 0826HM46">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Hora Inicio</label>
+                    <input type="time" class="form-control" name="horaInicio">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Hora Fin</label>
+                    <input type="time" class="form-control" name="horaFin">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Operadores</label>
+                    <input type="text" class="form-control" name="operadores"
+                           placeholder="Nombres de operadores">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Envasadores</label>
+                    <input type="text" class="form-control" name="envasadores"
+                           placeholder="Nombres de envasadores">
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📦 Tipo de Producto</h6>
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHojuelaAvena" value="true">
+                        <label class="form-check-label fw-semibold">Hojuela de Avena</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHarinaAvena" value="true">
+                        <label class="form-check-label fw-semibold">Harina de Avena</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHojuelaIntegral" value="true">
+                        <label class="form-check-label fw-semibold">Hojuela Integral</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHarinaIntegral" value="true">
+                        <label class="form-check-label fw-semibold">Harina Integral</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esOtro" value="true">
+                        <label class="form-check-label fw-semibold">Otro</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="provieneDeProdccion" value="true">
+                        <label class="form-check-label fw-semibold">Proveniente de Producción</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">🔢 Producción</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Total Sacos Fabricados</label>
+                    <input type="number" class="form-control" name="totalSacos"
+                           id="totalSacos" placeholder="0" min="0"
+                           oninput="calcUnidades()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Unidades por Saco</label>
+                    <input type="number" class="form-control" name="unidadesPorSaco"
+                           id="unidadesPorSaco" placeholder="Ej: 40" min="0"
+                           oninput="calcUnidades()">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Total Unidades Envasadas</label>
+                    <input type="number" class="form-control total-field" name="totalUnidades"
+                           id="totalUnidades" placeholder="0" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Total Fardos Fabricados</label>
+                    <input type="number" class="form-control" name="totalFardos"
+                           placeholder="0" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Total Producto Empacado (kg)</label>
+                    <input type="number" step="0.01" class="form-control" name="totalProductoEmpacadoKg"
+                           placeholder="0.00">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Materia Prima Utilizada (kg)</label>
+                    <input type="number" step="0.01" class="form-control" name="materiaPrimaUtilizadaKg"
+                           placeholder="0.00">
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📝 Observaciones</h6>
+            <textarea class="form-control" name="observaciones" rows="3"
+                      placeholder="Observaciones adicionales..."></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mb-5">
+            <button type="submit" class="btn btn-guardar">💾 Guardar Registro</button>
+            <a href="/empleado/dashboard" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function calcUnidades() {
+        const sacos = parseInt(document.getElementById('totalSacos').value) || 0;
+        const unidades = parseInt(document.getElementById('unidadesPorSaco').value) || 0;
+        document.getElementById('totalUnidades').value = sacos * unidades;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Producción Diaria de Granel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f0e8; }
+        .navbar { background-color: #2d5a27; }
+        .btn-guardar { background-color: #2d5a27; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: 600; }
+        .btn-guardar:hover { background-color: #1e3d1a; color: white; }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
+        .table thead th { background-color: #2d5a27; color: white; }
+        .total-field { background-color: #f0f7ee !important; font-weight: 600; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark px-4 py-3">
+    <span class="navbar-brand fw-bold">🌾 Mundo Avena</span>
+    <a href="/empleado/dashboard" class="btn btn-outline-light btn-sm">← Volver</a>
+</nav>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-4">📦 Producción Diaria de Granel</h4>
+
+    <form th:action="@{/empleado/granel}" method="post">
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">Información General</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha</label>
+                    <input type="date" class="form-control" name="fecha" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Turno</label>
+                    <select class="form-select" name="turno" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Día">Día</option>
+                        <option value="Turno 1">Turno 1</option>
+                        <option value="Turno 2">Turno 2</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Lectura Inicial Balanza (kg)</label>
+                    <input type="number" step="0.01" class="form-control" name="lecturaInicialBalanza">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Lectura Final Balanza (kg)</label>
+                    <input type="number" step="0.01" class="form-control" name="lecturaFinalBalanza">
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📊 Productos</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
+                    <tr>
+                        <th style="width:30%">Producto</th>
+                        <th>Lote</th>
+                        <th>Cant. Sacos</th>
+                        <th>Peso Sacos (kg)</th>
+                        <th>Total (kg)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Grano de Avena con Cascara -->
+                    <tr>
+                        <td class="fw-semibold">Grano de Avena con Cáscara</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGranoAvena"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGranoAvena" id="c1" oninput="calc('c1','p1','t1')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGranoAvena" id="p1" oninput="calc('c1','p1','t1')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGranoAvena" id="t1" readonly></td>
+                    </tr>
+                    <!-- Grano Avena Arranque -->
+                    <tr>
+                        <td class="fw-semibold">Grano de Avena c/C (Arranque)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGranoAvenaArranque"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGranoAvenaArranque" id="c2" oninput="calc('c2','p2','t2')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGranoAvenaArranque" id="p2" oninput="calc('c2','p2','t2')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGranoAvenaArranque" id="t2" readonly></td>
+                    </tr>
+                    <!-- Grano Avena Maquinaria -->
+                    <tr>
+                        <td class="fw-semibold">Grano de Avena c/C (Maquinaria)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGranoAvenaMaquinaria"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGranoAvenaMaquinaria" id="c3" oninput="calc('c3','p3','t3')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGranoAvenaMaquinaria" id="p3" oninput="calc('c3','p3','t3')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGranoAvenaMaquinaria" id="t3" readonly></td>
+                    </tr>
+                    <!-- Cascara -->
+                    <tr>
+                        <td class="fw-semibold">Cáscara</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCascara"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosCascara" id="c4" oninput="calc('c4','p4','t4')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosCascara" id="p4" oninput="calc('c4','p4','t4')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalCascara" id="t4" readonly></td>
+                    </tr>
+                    <!-- Avenilla -->
+                    <tr>
+                        <td class="fw-semibold">Avenilla (Zaranda)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteAvenilla"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosAvenilla" id="c5" oninput="calc('c5','p5','t5')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosAvenilla" id="p5" oninput="calc('c5','p5','t5')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalAvenilla" id="t5" readonly></td>
+                    </tr>
+                    <!-- Cebada -->
+                    <tr>
+                        <td class="fw-semibold">Cebada, Granos Extraños (Despedradora)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCebada"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosCebada" id="c6" oninput="calc('c6','p6','t6')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosCebada" id="p6" oninput="calc('c6','p6','t6')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalCebada" id="t6" readonly></td>
+                    </tr>
+                    <!-- Grano Quebrado -->
+                    <tr>
+                        <td class="fw-semibold">Grano de Avena Quebrado (Filtro 4)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGranoQuebrado"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGranoQuebrado" id="c7" oninput="calc('c7','p7','t7')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGranoQuebrado" id="p7" oninput="calc('c7','p7','t7')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGranoQuebrado" id="t7" readonly></td>
+                    </tr>
+                    <!-- Groats -->
+                    <tr>
+                        <td class="fw-semibold">Groats</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGroats"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGroats" id="c8" oninput="calc('c8','p8','t8')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGroats" id="p8" oninput="calc('c8','p8','t8')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGroats" id="t8" readonly></td>
+                    </tr>
+                    <!-- Fibra de Avena -->
+                    <tr>
+                        <td class="fw-semibold">Fibra de Avena</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteFibraAvena"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosFibraAvena" id="c9" oninput="calc('c9','p9','t9')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosFibraAvena" id="p9" oninput="calc('c9','p9','t9')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalFibraAvena" id="t9" readonly></td>
+                    </tr>
+                    <!-- Fibra Rechazo -->
+                    <tr>
+                        <td class="fw-semibold">Fibra de Avena (Rechazo)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteFibraAvenaRechazo"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosFibraAvenaRechazo" id="c10" oninput="calc('c10','p10','t10')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosFibraAvenaRechazo" id="p10" oninput="calc('c10','p10','t10')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalFibraAvenaRechazo" id="t10" readonly></td>
+                    </tr>
+                    <!-- Grano Perlado -->
+                    <tr>
+                        <td class="fw-semibold">Grano Perlado</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGranoPerlado"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGranoPerlado" id="c11" oninput="calc('c11','p11','t11')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGranoPerlado" id="p11" oninput="calc('c11','p11','t11')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGranoPerlado" id="t11" readonly></td>
+                    </tr>
+                    <!-- Grano Cortado -->
+                    <tr>
+                        <td class="fw-semibold">Grano Cortado (Groat Cortadoras)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGranoCortado"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGranoCortado" id="c12" oninput="calc('c12','p12','t12')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGranoCortado" id="p12" oninput="calc('c12','p12','t12')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGranoCortado" id="t12" readonly></td>
+                    </tr>
+                    <!-- Hojuela Mosh -->
+                    <tr class="table-success">
+                        <td class="fw-semibold">Hojuela Mosh</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHojuelaMosh"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosHojuelaMosh" id="c13" oninput="calc('c13','p13','t13')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosHojuelaMosh" id="p13" oninput="calc('c13','p13','t13')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalHojuelaMosh" id="t13" readonly></td>
+                    </tr>
+                    <!-- Hojuela Mosh Arranque -->
+                    <tr>
+                        <td class="fw-semibold">Hojuela Mosh (Arranque)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHojuelaMoshArranque"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosHojuelaMoshArranque" id="c14" oninput="calc('c14','p14','t14')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosHojuelaMoshArranque" id="p14" oninput="calc('c14','p14','t14')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalHojuelaMoshArranque" id="t14" readonly></td>
+                    </tr>
+                    <!-- Hojuelon -->
+                    <tr>
+                        <td class="fw-semibold">Hojuelón</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHojuelon"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosHojuelon" id="c15" oninput="calc('c15','p15','t15')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosHojuelon" id="p15" oninput="calc('c15','p15','t15')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalHojuelon" id="t15" readonly></td>
+                    </tr>
+                    <!-- Harina OTW -->
+                    <tr class="table-success">
+                        <td class="fw-semibold">Harina OTW</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaOTW"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosHarinaOTW" id="c16" oninput="calc('c16','p16','t16')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosHarinaOTW" id="p16" oninput="calc('c16','p16','t16')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalHarinaOTW" id="t16" readonly></td>
+                    </tr>
+                    <!-- Crema de Avena -->
+                    <tr>
+                        <td class="fw-semibold">Crema de Avena</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCremaAvena"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosCremaAvena" id="c17" oninput="calc('c17','p17','t17')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosCremaAvena" id="p17" oninput="calc('c17','p17','t17')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalCremaAvena" id="t17" readonly></td>
+                    </tr>
+                    <!-- Hojuela Integral -->
+                    <tr class="table-success">
+                        <td class="fw-semibold">Hojuela Integral</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHojuelaIntegral"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosHojuelaIntegral" id="c18" oninput="calc('c18','p18','t18')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosHojuelaIntegral" id="p18" oninput="calc('c18','p18','t18')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalHojuelaIntegral" id="t18" readonly></td>
+                    </tr>
+                    <!-- Harina de Avena -->
+                    <tr class="table-success">
+                        <td class="fw-semibold">Harina de Avena</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaAvena"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosHarinaAvena" id="c19" oninput="calc('c19','p19','t19')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosHarinaAvena" id="p19" oninput="calc('c19','p19','t19')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalHarinaAvena" id="t19" readonly></td>
+                    </tr>
+                    <!-- Granola -->
+                    <tr>
+                        <td class="fw-semibold">Granola</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteGranola"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosGranola" id="c20" oninput="calc('c20','p20','t20')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosGranola" id="p20" oninput="calc('c20','p20','t20')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalGranola" id="t20" readonly></td>
+                    </tr>
+                    <!-- Carbonato de Calcio -->
+                    <tr>
+                        <td class="fw-semibold">Carbonato de Calcio</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoCalcio"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosCarbonatoCalcio" id="c21" oninput="calc('c21','p21','t21')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosCarbonatoCalcio" id="p21" oninput="calc('c21','p21','t21')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalCarbonatoCalcio" id="t21" readonly></td>
+                    </tr>
+                    <!-- Vitaminas -->
+                    <tr>
+                        <td class="fw-semibold">Vitaminas (Premezcla)</td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminas"></td>
+                        <td><input type="number" class="form-control form-control-sm" name="cantidadSacosVitaminas" id="c22" oninput="calc('c22','p22','t22')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="pesoSacosVitaminas" id="p22" oninput="calc('c22','p22','t22')"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="totalVitaminas" id="t22" readonly></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">🎒 Tipo de Saco</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="sacoBlanco" id="sacoBlanco" value="true">
+                        <label class="form-check-label fw-semibold" for="sacoBlanco">Blanco</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="sacoRojoMundoAvena" id="sacoRojo" value="true">
+                        <label class="form-check-label fw-semibold" for="sacoRojo">Rojo Mundo Avena</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="sacoAvenaEstrella" id="sacoEstrella" value="true">
+                        <label class="form-check-label fw-semibold" for="sacoEstrella">Avena Estrella</label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="sacoOtros" id="sacoOtros" value="true">
+                        <label class="form-check-label fw-semibold" for="sacoOtros">Otros</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📝 Observaciones</h6>
+            <textarea class="form-control" name="observaciones" rows="3"
+                      placeholder="Observaciones adicionales..."></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mb-5">
+            <button type="submit" class="btn btn-guardar">💾 Guardar Registro</button>
+            <a href="/empleado/dashboard" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function calc(cantId, pesoId, totalId) {
+        const cant = parseFloat(document.getElementById(cantId).value) || 0;
+        const peso = parseFloat(document.getElementById(pesoId).value) || 0;
+        document.getElementById(totalId).value = (cant * peso).toFixed(2);
+    }
+</script>
+</body>
+</html>

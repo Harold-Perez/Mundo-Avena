@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Control de Pesos a Granel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f0e8; }
+        .navbar { background-color: #2d5a27; }
+        .btn-guardar { background-color: #2d5a27; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: 600; }
+        .btn-guardar:hover { background-color: #1e3d1a; color: white; }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
+        .saco-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .saco-item { display: flex; flex-direction: column; align-items: center; }
+        .saco-num { font-size: 11px; font-weight: 700; color: #2d5a27; margin-bottom: 2px; }
+        .saco-input { width: 100%; text-align: center; font-size: 12px; padding: 4px; border: 1px solid #ced4da; border-radius: 4px; }
+        .saco-input:focus { border-color: #2d5a27; outline: none; box-shadow: 0 0 0 2px rgba(45,90,39,0.2); }
+        .total-box { background-color: #2d5a27; color: white; border-radius: 12px; padding: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark px-4 py-3">
+    <span class="navbar-brand fw-bold">🌾 Mundo Avena</span>
+    <a href="/empleado/dashboard" class="btn btn-outline-light btn-sm">← Volver</a>
+</nav>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-4">⚖️ Control de Pesos de Producto a Granel</h4>
+
+    <form th:action="@{/empleado/pesos}" method="post">
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">Información General</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Producto</label>
+                    <input type="text" class="form-control" name="producto"
+                           placeholder="Ej: Afrecho" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Lote</label>
+                    <input type="text" class="form-control" name="lote">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Fecha</label>
+                    <input type="date" class="form-control" name="fecha" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Hora Inicio</label>
+                    <input type="time" class="form-control" name="horaInicio">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Hora Fin</label>
+                    <input type="time" class="form-control" name="horaFin">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Operador</label>
+                    <input type="text" class="form-control" name="operador"
+                           placeholder="Nombre del operador">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Envasadores</label>
+                    <input type="text" class="form-control" name="envasadores"
+                           placeholder="Nombres de envasadores">
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">⚖️ Pesos por Saco (kg)</h6>
+            <p class="text-muted small mb-3">Ingresa el peso de cada saco. Los campos vacíos se omiten automáticamente.</p>
+            <div class="saco-grid">
+                <div class="saco-item"><span class="saco-num">1</span><input type="number" step="0.01" class="saco-input" name="saco1" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">2</span><input type="number" step="0.01" class="saco-input" name="saco2" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">3</span><input type="number" step="0.01" class="saco-input" name="saco3" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">4</span><input type="number" step="0.01" class="saco-input" name="saco4" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">5</span><input type="number" step="0.01" class="saco-input" name="saco5" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">6</span><input type="number" step="0.01" class="saco-input" name="saco6" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">7</span><input type="number" step="0.01" class="saco-input" name="saco7" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">8</span><input type="number" step="0.01" class="saco-input" name="saco8" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">9</span><input type="number" step="0.01" class="saco-input" name="saco9" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">10</span><input type="number" step="0.01" class="saco-input" name="saco10" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">11</span><input type="number" step="0.01" class="saco-input" name="saco11" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">12</span><input type="number" step="0.01" class="saco-input" name="saco12" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">13</span><input type="number" step="0.01" class="saco-input" name="saco13" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">14</span><input type="number" step="0.01" class="saco-input" name="saco14" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">15</span><input type="number" step="0.01" class="saco-input" name="saco15" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">16</span><input type="number" step="0.01" class="saco-input" name="saco16" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">17</span><input type="number" step="0.01" class="saco-input" name="saco17" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">18</span><input type="number" step="0.01" class="saco-input" name="saco18" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">19</span><input type="number" step="0.01" class="saco-input" name="saco19" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">20</span><input type="number" step="0.01" class="saco-input" name="saco20" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">21</span><input type="number" step="0.01" class="saco-input" name="saco21" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">22</span><input type="number" step="0.01" class="saco-input" name="saco22" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">23</span><input type="number" step="0.01" class="saco-input" name="saco23" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">24</span><input type="number" step="0.01" class="saco-input" name="saco24" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">25</span><input type="number" step="0.01" class="saco-input" name="saco25" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">26</span><input type="number" step="0.01" class="saco-input" name="saco26" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">27</span><input type="number" step="0.01" class="saco-input" name="saco27" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">28</span><input type="number" step="0.01" class="saco-input" name="saco28" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">29</span><input type="number" step="0.01" class="saco-input" name="saco29" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">30</span><input type="number" step="0.01" class="saco-input" name="saco30" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">31</span><input type="number" step="0.01" class="saco-input" name="saco31" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">32</span><input type="number" step="0.01" class="saco-input" name="saco32" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">33</span><input type="number" step="0.01" class="saco-input" name="saco33" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">34</span><input type="number" step="0.01" class="saco-input" name="saco34" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">35</span><input type="number" step="0.01" class="saco-input" name="saco35" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">36</span><input type="number" step="0.01" class="saco-input" name="saco36" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">37</span><input type="number" step="0.01" class="saco-input" name="saco37" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">38</span><input type="number" step="0.01" class="saco-input" name="saco38" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">39</span><input type="number" step="0.01" class="saco-input" name="saco39" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">40</span><input type="number" step="0.01" class="saco-input" name="saco40" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">41</span><input type="number" step="0.01" class="saco-input" name="saco41" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">42</span><input type="number" step="0.01" class="saco-input" name="saco42" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">43</span><input type="number" step="0.01" class="saco-input" name="saco43" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">44</span><input type="number" step="0.01" class="saco-input" name="saco44" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">45</span><input type="number" step="0.01" class="saco-input" name="saco45" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">46</span><input type="number" step="0.01" class="saco-input" name="saco46" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">47</span><input type="number" step="0.01" class="saco-input" name="saco47" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">48</span><input type="number" step="0.01" class="saco-input" name="saco48" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">49</span><input type="number" step="0.01" class="saco-input" name="saco49" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">50</span><input type="number" step="0.01" class="saco-input" name="saco50" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">51</span><input type="number" step="0.01" class="saco-input" name="saco51" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">52</span><input type="number" step="0.01" class="saco-input" name="saco52" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">53</span><input type="number" step="0.01" class="saco-input" name="saco53" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">54</span><input type="number" step="0.01" class="saco-input" name="saco54" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">55</span><input type="number" step="0.01" class="saco-input" name="saco55" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">56</span><input type="number" step="0.01" class="saco-input" name="saco56" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">57</span><input type="number" step="0.01" class="saco-input" name="saco57" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">58</span><input type="number" step="0.01" class="saco-input" name="saco58" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">59</span><input type="number" step="0.01" class="saco-input" name="saco59" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">60</span><input type="number" step="0.01" class="saco-input" name="saco60" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">61</span><input type="number" step="0.01" class="saco-input" name="saco61" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">62</span><input type="number" step="0.01" class="saco-input" name="saco62" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">63</span><input type="number" step="0.01" class="saco-input" name="saco63" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">64</span><input type="number" step="0.01" class="saco-input" name="saco64" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">65</span><input type="number" step="0.01" class="saco-input" name="saco65" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">66</span><input type="number" step="0.01" class="saco-input" name="saco66" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">67</span><input type="number" step="0.01" class="saco-input" name="saco67" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">68</span><input type="number" step="0.01" class="saco-input" name="saco68" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">69</span><input type="number" step="0.01" class="saco-input" name="saco69" oninput="calcTotal()"></div>
+                <div class="saco-item"><span class="saco-num">70</span><input type="number" step="0.01" class="saco-input" name="saco70" oninput="calcTotal()"></div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="total-box">
+                        <div class="fs-6 mb-1">Total Sacos</div>
+                        <div class="fs-2 fw-bold" id="displaySacos">0</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="total-box">
+                        <div class="fs-6 mb-1">Total Kg</div>
+                        <div class="fs-2 fw-bold" id="displayKg">0.00</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="total-box">
+                        <div class="fs-6 mb-1">Peso Promedio</div>
+                        <div class="fs-2 fw-bold" id="displayPromedio">0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📝 Observaciones</h6>
+            <textarea class="form-control" name="observaciones" rows="3"
+                      placeholder="Observaciones adicionales..."></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mb-5">
+            <button type="submit" class="btn btn-guardar">💾 Guardar Registro</button>
+            <a href="/empleado/dashboard" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function calcTotal() {
+        const inputs = document.querySelectorAll('.saco-input');
+        let total = 0;
+        let sacos = 0;
+        inputs.forEach(input => {
+            const val = parseFloat(input.value);
+            if (!isNaN(val) && val > 0) {
+                total += val;
+                sacos++;
+            }
+        });
+        document.getElementById('displaySacos').textContent = sacos;
+        document.getElementById('displayKg').textContent = total.toFixed(2);
+        document.getElementById('displayPromedio').textContent = sacos > 0 ? (total / sacos).toFixed(2) : '0.00';
+    }
+</script>
+</body>
+</html>
