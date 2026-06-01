@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Registros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f0e8; }
+        .navbar { background-color: #2d5a27; }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
+        .table thead th { background-color: #2d5a27; color: white; }
+        .btn-buscar { background-color: #2d5a27; color: white; border: none; padding: 8px 24px; border-radius: 8px; font-weight: 600; }
+        .btn-buscar:hover { background-color: #1e3d1a; color: white; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark px-4 py-3">
+    <span class="navbar-brand fw-bold">🌾 Mundo Avena - Gerencia</span>
+    <div class="d-flex gap-3">
+        <a href="/gerencia/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
+        <a href="/gerencia/costos" class="btn btn-warning btn-sm fw-bold">💰 Costos</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+        </form>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-4">📋 Historial de Registros</h4>
+
+    <!-- Filtro por fecha -->
+    <div class="card p-4 mb-4">
+        <h6 class="section-title">🔍 Buscar por Fecha</h6>
+        <form th:action="@{/gerencia/historial}" method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Fecha específica</label>
+                <input type="date" class="form-control" name="fecha" th:value="${fecha}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Mes</label>
+                <select class="form-select" name="mes">
+                    <option value="1"  th:selected="${mes == 1}">Enero</option>
+                    <option value="2"  th:selected="${mes == 2}">Febrero</option>
+                    <option value="3"  th:selected="${mes == 3}">Marzo</option>
+                    <option value="4"  th:selected="${mes == 4}">Abril</option>
+                    <option value="5"  th:selected="${mes == 5}">Mayo</option>
+                    <option value="6"  th:selected="${mes == 6}">Junio</option>
+                    <option value="7"  th:selected="${mes == 7}">Julio</option>
+                    <option value="8"  th:selected="${mes == 8}">Agosto</option>
+                    <option value="9"  th:selected="${mes == 9}">Septiembre</option>
+                    <option value="10" th:selected="${mes == 10}">Octubre</option>
+                    <option value="11" th:selected="${mes == 11}">Noviembre</option>
+                    <option value="12" th:selected="${mes == 12}">Diciembre</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Año</label>
+                <input type="number" class="form-control" name="anio" th:value="${anio}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-buscar w-100">🔍 Buscar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Registros del dia -->
+    <div class="card p-4 mb-4">
+        <h6 class="section-title">📅 Registros del día: <span th:text="${fecha}"></span></h6>
+        <div class="row g-3">
+            <div class="col-md-3 text-center">
+                <div class="fw-bold fs-3 text-success" th:text="${#lists.size(tiemposFecha)}">0</div>
+                <div class="text-muted small">Tiempos de Producción</div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="fw-bold fs-3 text-warning" th:text="${#lists.size(granelFecha)}">0</div>
+                <div class="text-muted small">Producción Granel</div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="fw-bold fs-3 text-primary" th:text="${#lists.size(ptFecha)}">0</div>
+                <div class="text-muted small">Control PT</div>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="fw-bold fs-3 text-danger" th:text="${#lists.size(conciliacionFecha)}">0</div>
+                <div class="text-muted small">Conciliación</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tiempos de produccion del dia -->
+    <div class="card p-4 mb-4">
+        <h6 class="section-title">⏱️ Tiempos de Producción</h6>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Operador</th>
+                    <th>Motores Inicio</th>
+                    <th>Motores Fin</th>
+                    <th>Producción Inicio</th>
+                    <th>Producción Fin</th>
+                    <th>Observaciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(tiemposFecha)}">
+                    <td colspan="7" class="text-center text-muted py-3">No hay registros</td>
+                </tr>
+                <tr th:each="r : ${tiemposFecha}">
+                    <td th:text="${r.fecha}"></td>
+                    <td th:text="${r.operador}"></td>
+                    <td th:text="${r.motoresInicio}"></td>
+                    <td th:text="${r.motoresFin}"></td>
+                    <td th:text="${r.produccionInicio}"></td>
+                    <td th:text="${r.produccionFin}"></td>
+                    <td th:text="${r.observaciones}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Control PT del dia -->
+    <div class="card p-4 mb-4">
+        <h6 class="section-title">🏭 Control Diario PT</h6>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Producto</th>
+                    <th>Lote</th>
+                    <th>Total Unidades</th>
+                    <th>Total Sacos</th>
+                    <th>MP (kg)</th>
+                    <th>Operadores</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(ptFecha)}">
+                    <td colspan="7" class="text-center text-muted py-3">No hay registros</td>
+                </tr>
+                <tr th:each="r : ${ptFecha}">
+                    <td th:text="${r.fecha}"></td>
+                    <td th:text="${r.producto}"></td>
+                    <td th:text="${r.lote}"></td>
+                    <td th:text="${r.totalUnidades}"></td>
+                    <td th:text="${r.totalSacos}"></td>
+                    <td th:text="${r.materiaPrimaUtilizadaKg}"></td>
+                    <td th:text="${r.operadores}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Resumen mensual -->
+    <div class="card p-4 mb-5">
+        <h6 class="section-title">📊 Resumen Mensual — <span th:text="${mes}"></span>/<span th:text="${anio}"></span></h6>
+        <div class="row g-3">
+            <div class="col-md-4 text-center">
+                <div class="fw-bold fs-2 text-success" th:text="${#lists.size(tiemposMes)}">0</div>
+                <div class="text-muted">Registros de Tiempos</div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="fw-bold fs-2 text-warning" th:text="${#lists.size(granelMes)}">0</div>
+                <div class="text-muted">Registros Granel</div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="fw-bold fs-2 text-primary" th:text="${#lists.size(ptMes)}">0</div>
+                <div class="text-muted">Registros Control PT</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

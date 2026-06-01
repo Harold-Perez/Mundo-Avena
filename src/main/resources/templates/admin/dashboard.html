@@ -8,18 +8,24 @@
     <style>
         body { background-color: #f5f0e8; }
         .navbar { background-color: #2d5a27; }
-        .card-menu {
-            border-radius: 12px; border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s; cursor: pointer;
-        }
-        .card-menu:hover { transform: translateY(-4px); }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .stat-card { border-radius: 12px; padding: 20px; color: white; }
+        .bg-verde { background-color: #2d5a27; }
+        .bg-dorado { background-color: #d4a017; }
+        .bg-azul { background-color: #1a5276; }
+        .bg-rojo { background-color: #922b21; }
+        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
+        .table thead th { background-color: #2d5a27; color: white; }
+        .nav-link-admin { color: white; text-decoration: none; padding: 6px 12px; border-radius: 6px; }
+        .nav-link-admin:hover { background-color: rgba(255,255,255,0.2); color: white; }
     </style>
 </head>
 <body>
 <nav class="navbar navbar-dark px-4 py-3">
-    <span class="navbar-brand fw-bold">🌾 Mundo Avena - Admin</span>
+    <span class="navbar-brand fw-bold">🌾 Mundo Avena — Admin</span>
     <div class="d-flex align-items-center gap-3">
+        <a href="/admin/usuarios" class="nav-link-admin">👥 Usuarios</a>
+        <a href="/admin/auditoria" class="nav-link-admin">🔍 Auditoría</a>
         <form th:action="@{/logout}" method="post">
             <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
         </form>
@@ -27,31 +33,139 @@
 </nav>
 
 <div class="container mt-4">
-    <h4 class="fw-bold mb-4">🔧 Panel Administrador</h4>
+    <h4 class="fw-bold mb-1">🔧 Panel Administrador</h4>
+    <p class="text-muted mb-4" th:text="'Fecha: ' + ${hoy}"></p>
 
-    <div class="row g-3">
-        <div class="col-md-4">
-            <a href="/admin/usuarios" class="text-decoration-none">
-                <div class="card card-menu p-4 text-center">
-                    <div class="fs-1">👥</div>
-                    <h6 class="fw-bold text-dark mt-2">Gestión de Usuarios</h6>
-                    <p class="text-muted small mb-0">Crear, editar y desactivar usuarios</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-menu p-4 text-center opacity-50">
-                <div class="fs-1">📊</div>
-                <h6 class="fw-bold text-dark mt-2">Reportes</h6>
-                <p class="text-muted small mb-0">Próximamente</p>
+    <!-- Estadísticas usuarios -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card bg-verde">
+                <div class="small mb-1">Total Usuarios</div>
+                <div class="fs-1 fw-bold" th:text="${totalUsuarios}">0</div>
+                <div class="small" th:text="${usuariosActivos} + ' activos'"></div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card card-menu p-4 text-center opacity-50">
-                <div class="fs-1">💰</div>
-                <h6 class="fw-bold text-dark mt-2">Cálculo de Costos</h6>
-                <p class="text-muted small mb-0">Próximamente</p>
+        <div class="col-md-3">
+            <div class="stat-card bg-dorado">
+                <div class="small mb-1">Empleados</div>
+                <div class="fs-1 fw-bold" th:text="${totalEmpleados}">0</div>
+                <div class="small">registrando producción</div>
             </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-azul">
+                <div class="small mb-1">Gerencia</div>
+                <div class="fs-1 fw-bold" th:text="${totalGerencia}">0</div>
+                <div class="small">usuarios gerencia</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card bg-rojo">
+                <div class="small mb-1">Total Registros</div>
+                <div class="fs-1 fw-bold" th:text="${totalRegistros}">0</div>
+                <div class="small">en todos los formularios</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registros de hoy -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Tiempos hoy</div>
+                <div class="fs-2 fw-bold text-success" th:text="${tiemposHoy}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Granel hoy</div>
+                <div class="fs-2 fw-bold text-warning" th:text="${granelHoy}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Control PT hoy</div>
+                <div class="fs-2 fw-bold text-primary" th:text="${ptHoy}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 text-center">
+                <div class="text-muted small">Cierres mensuales</div>
+                <div class="fs-2 fw-bold text-danger" th:text="${totalCierres}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla usuarios -->
+    <div class="card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="section-title mb-0">👥 Usuarios del Sistema</h6>
+            <a href="/admin/usuarios/nuevo" class="btn btn-success btn-sm">+ Nuevo Usuario</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td th:text="${u.username}"></td>
+                    <td th:text="${u.nombreCompleto}"></td>
+                    <td>
+                        <span th:if="${u.rol.name() == 'ADMINISTRADOR'}" class="badge bg-success">Admin</span>
+                        <span th:if="${u.rol.name() == 'GERENCIA'}" class="badge bg-warning text-dark">Gerencia</span>
+                        <span th:if="${u.rol.name() == 'EMPLEADO'}" class="badge bg-secondary">Empleado</span>
+                    </td>
+                    <td>
+                        <span th:if="${u.activo}" class="badge bg-success">Activo</span>
+                        <span th:unless="${u.activo}" class="badge bg-danger">Inactivo</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/usuarios/editar/{id}(id=${u.id})}"
+                           class="btn btn-sm btn-outline-primary">✏️ Editar</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cierres mensuales -->
+    <div class="card p-4 mb-5">
+        <h6 class="section-title">💰 Cierres Mensuales</h6>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Mes</th>
+                    <th>Año</th>
+                    <th>Estado</th>
+                    <th>Calculado por</th>
+                    <th>Fecha</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(cierres)}">
+                    <td colspan="5" class="text-center text-muted py-3">No hay cierres</td>
+                </tr>
+                <tr th:each="c : ${cierres}">
+                    <td th:text="${c.mes}"></td>
+                    <td th:text="${c.anio}"></td>
+                    <td>
+                        <span th:if="${c.estado.name() == 'CONFIRMADO'}" class="badge bg-success">Confirmado</span>
+                        <span th:if="${c.estado.name() == 'BORRADOR'}" class="badge bg-warning text-dark">Borrador</span>
+                    </td>
+                    <td th:text="${c.calculadoPor?.nombreCompleto}"></td>
+                    <td th:text="${#temporals.format(c.fechaCalculo, 'dd/MM/yyyy HH:mm')}"></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

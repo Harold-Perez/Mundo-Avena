@@ -11,8 +11,9 @@
         .btn-guardar:hover { background-color: #1e3d1a; color: white; }
         .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
-        .table thead th { background-color: #2d5a27; color: white; }
         .total-field { background-color: #f0f7ee !important; font-weight: 600; }
+        .list-group-item-action { cursor: pointer; }
+        .list-group-item-action:hover { background-color: #f0f7ee; }
     </style>
 </head>
 <body>
@@ -50,6 +51,13 @@
                     <label class="form-label fw-semibold">Lote</label>
                     <input type="text" class="form-control" name="lote"
                            placeholder="Ej: 0926H26">
+                </div>
+                <div class="col-md-6 position-relative">
+                    <label class="form-label fw-semibold">Operador</label>
+                    <input type="text" class="form-control" name="operador" id="operadorInput"
+                           placeholder="Escribe para buscar operador..." autocomplete="off">
+                    <div id="operadorSuggestions" class="list-group position-absolute w-100"
+                         style="z-index:1000; display:none;"></div>
                 </div>
             </div>
         </div>
@@ -125,6 +133,37 @@
         const merma = parseFloat(document.getElementById('mpMerma').value) || 0;
         document.getElementById('mpTotal').value = (granel + merma).toFixed(3);
     }
+
+    function initAutocomplete(inputId, suggestionsId) {
+        const input = document.getElementById(inputId);
+        const suggestions = document.getElementById(suggestionsId);
+        if (!input) return;
+        input.addEventListener('input', function() {
+            const val = this.value.trim();
+            suggestions.innerHTML = '';
+            if (val.length < 1) { suggestions.style.display = 'none'; return; }
+            fetch('/api/usuarios/buscar?q=' + encodeURIComponent(val))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) { suggestions.style.display = 'none'; return; }
+                    data.forEach(nombre => {
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'list-group-item list-group-item-action';
+                        item.textContent = nombre;
+                        item.onclick = () => { input.value = nombre; suggestions.style.display = 'none'; };
+                        suggestions.appendChild(item);
+                    });
+                    suggestions.style.display = 'block';
+                });
+        });
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !suggestions.contains(e.target))
+                suggestions.style.display = 'none';
+        });
+    }
+
+    initAutocomplete('operadorInput', 'operadorSuggestions');
 </script>
 </body>
 </html>

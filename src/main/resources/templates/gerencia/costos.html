@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cálculo de Costos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f0e8; }
+        .navbar { background-color: #2d5a27; }
+        .btn-calcular { background-color: #2d5a27; color: white; border: none; padding: 12px 40px; border-radius: 8px; font-weight: 700; font-size: 16px; }
+        .btn-calcular:hover { background-color: #1e3d1a; color: white; }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
+        .table thead th { background-color: #2d5a27; color: white; }
+        .costo-input { font-weight: 600; color: #2d5a27; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark px-4 py-3">
+    <span class="navbar-brand fw-bold">🌾 Mundo Avena - Gerencia</span>
+    <div class="d-flex gap-3">
+        <a href="/gerencia/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+        </form>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
+    <h4 class="fw-bold mb-4">💰 Cálculo de Costo Variable Directo por Unidad</h4>
+
+    <form th:action="@{/gerencia/costos/calcular}" method="post">
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📅 Período</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Mes</label>
+                    <select class="form-select" name="mes" required>
+                        <option value="1"  th:selected="${mesActual == 1}">Enero</option>
+                        <option value="2"  th:selected="${mesActual == 2}">Febrero</option>
+                        <option value="3"  th:selected="${mesActual == 3}">Marzo</option>
+                        <option value="4"  th:selected="${mesActual == 4}">Abril</option>
+                        <option value="5"  th:selected="${mesActual == 5}">Mayo</option>
+                        <option value="6"  th:selected="${mesActual == 6}">Junio</option>
+                        <option value="7"  th:selected="${mesActual == 7}">Julio</option>
+                        <option value="8"  th:selected="${mesActual == 8}">Agosto</option>
+                        <option value="9"  th:selected="${mesActual == 9}">Septiembre</option>
+                        <option value="10" th:selected="${mesActual == 10}">Octubre</option>
+                        <option value="11" th:selected="${mesActual == 11}">Noviembre</option>
+                        <option value="12" th:selected="${mesActual == 12}">Diciembre</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Año</label>
+                    <input type="number" class="form-control" name="anio" th:value="${anioActual}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Tipo de Cambio (Q/USD)</label>
+                    <input type="number" step="0.01" class="form-control costo-input" name="tipoCambio" th:value="${tipoCambio}" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">🌾 Costos de Materia Prima (Q/kg)</h6>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Avena entera con cáscara</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.0001" class="form-control costo-input" name="costoAvenaKg" th:value="${costoAvena}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Harina de avena</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.0001" class="form-control costo-input" name="costoHarinaKg" th:value="${costoHarina}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Carbonato de calcio</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.0001" class="form-control costo-input" name="costoCarbonatoKg" th:value="${costoCarbonato}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Vitaminas/Premezcla</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.0001" class="form-control costo-input" name="costoVitaminasKg" th:value="${costoVitaminas}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📐 Proporciones de MP por kg de Producto Terminado</h6>
+            <p class="text-muted small mb-3">Kg de cada MP usados por kg de producto terminado (del balance de masa del Excel)</p>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Proporción Harina (kg/kg PT)</label>
+                    <input type="number" step="0.000001" class="form-control costo-input" name="propHarina" th:value="${propHarina}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Proporción Carbonato (kg/kg PT)</label>
+                    <input type="number" step="0.000001" class="form-control costo-input" name="propCarbonato" th:value="${propCarbonato}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Proporción Vitaminas (kg/kg PT)</label>
+                    <input type="number" step="0.000001" class="form-control costo-input" name="propVitaminas" th:value="${propVitaminas}" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📦 Costo de Material de Empaque (Q/unidad)</h6>
+            <p class="text-muted small mb-3">Costo de bobina/saco por unidad producida según presentación</p>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Nutremas 1200g</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.00001" class="form-control costo-input" name="empNutremas1200g" th:value="${empNutremas1200g}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Nutremas 900g</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.00001" class="form-control costo-input" name="empNutremas900g" th:value="${empNutremas900g}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Nutremas RTD 900g</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.00001" class="form-control costo-input" name="empNutremasRTD900g" th:value="${empNutremasRTD900g}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Nutremas Frescos 600g</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.00001" class="form-control costo-input" name="empNutremasFrescos600g" th:value="${empNutremasFrescos600g}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Nutremas 600g</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.00001" class="form-control costo-input" name="empNutremas600g" th:value="${empNutremas600g}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Rico Mosh 360g</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.00001" class="form-control costo-input" name="empRicoMosh360g" th:value="${empRicoMosh360g}" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Avena Estrella 50lb</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.00001" class="form-control costo-input" name="empAvenaEstrella50lb" th:value="${empAvenaEstrella50lb}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">⚡ Costos de Conversión (Q/kg producido)</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Energía Eléctrica</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.0001" class="form-control costo-input" name="costoEEKg" th:value="${costoEE}" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Vapor / Caldera</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.0001" class="form-control costo-input" name="costoVaporKg" th:value="${costoVapor}" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Mano de Obra</label>
+                    <div class="input-group">
+                        <span class="input-group-text">Q</span>
+                        <input type="number" step="0.0001" class="form-control costo-input" name="costoMOKg" th:value="${costoMO}" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-5">
+            <button type="submit" class="btn btn-calcular">
+                🔢 Calcular Costo por Unidad
+            </button>
+        </div>
+    </form>
+
+    <div class="card p-4 mb-5">
+        <h6 class="section-title">📋 Historial de Cierres</h6>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                <tr>
+                    <th>Mes</th>
+                    <th>Año</th>
+                    <th>Estado</th>
+                    <th>Calculado por</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(cierres)}">
+                    <td colspan="6" class="text-center text-muted py-3">No hay cierres registrados</td>
+                </tr>
+                <tr th:each="c : ${cierres}">
+                    <td th:text="${c.mes}"></td>
+                    <td th:text="${c.anio}"></td>
+                    <td>
+                        <span th:if="${c.estado.name() == 'CONFIRMADO'}" class="badge bg-success">Confirmado</span>
+                        <span th:if="${c.estado.name() == 'BORRADOR'}" class="badge bg-warning text-dark">Borrador</span>
+                    </td>
+                    <td th:text="${c.calculadoPor?.nombreCompleto}"></td>
+                    <td th:text="${#temporals.format(c.fechaCalculo, 'dd/MM/yyyy HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/gerencia/costos/ver/{id}(id=${c.id})}"
+                           class="btn btn-sm btn-outline-primary">Ver Detalle</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

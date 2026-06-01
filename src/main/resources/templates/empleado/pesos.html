@@ -17,6 +17,8 @@
         .saco-input { width: 100%; text-align: center; font-size: 12px; padding: 4px; border: 1px solid #ced4da; border-radius: 4px; }
         .saco-input:focus { border-color: #2d5a27; outline: none; box-shadow: 0 0 0 2px rgba(45,90,39,0.2); }
         .total-box { background-color: #2d5a27; color: white; border-radius: 12px; padding: 20px; text-align: center; }
+        .list-group-item-action { cursor: pointer; }
+        .list-group-item-action:hover { background-color: #f0f7ee; }
     </style>
 </head>
 <body>
@@ -54,15 +56,23 @@
                     <label class="form-label fw-semibold">Hora Fin</label>
                     <input type="time" class="form-control" name="horaFin">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 position-relative">
                     <label class="form-label fw-semibold">Operador</label>
                     <input type="text" class="form-control" name="operador"
-                           placeholder="Nombre del operador">
+                           id="operadorInput"
+                           placeholder="Escribe para buscar operador..."
+                           autocomplete="off">
+                    <div id="operadorSuggestions" class="list-group position-absolute w-100"
+                         style="z-index:1000; display:none;"></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 position-relative">
                     <label class="form-label fw-semibold">Envasadores</label>
                     <input type="text" class="form-control" name="envasadores"
-                           placeholder="Nombres de envasadores">
+                           id="envasadoresInput"
+                           placeholder="Escribe para buscar envasador..."
+                           autocomplete="off">
+                    <div id="envasadoresSuggestions" class="list-group position-absolute w-100"
+                         style="z-index:1000; display:none;"></div>
                 </div>
             </div>
         </div>
@@ -181,19 +191,47 @@
 <script>
     function calcTotal() {
         const inputs = document.querySelectorAll('.saco-input');
-        let total = 0;
-        let sacos = 0;
+        let total = 0; let sacos = 0;
         inputs.forEach(input => {
             const val = parseFloat(input.value);
-            if (!isNaN(val) && val > 0) {
-                total += val;
-                sacos++;
-            }
+            if (!isNaN(val) && val > 0) { total += val; sacos++; }
         });
         document.getElementById('displaySacos').textContent = sacos;
         document.getElementById('displayKg').textContent = total.toFixed(2);
         document.getElementById('displayPromedio').textContent = sacos > 0 ? (total / sacos).toFixed(2) : '0.00';
     }
+
+    function initAutocomplete(inputId, suggestionsId) {
+        const input = document.getElementById(inputId);
+        const suggestions = document.getElementById(suggestionsId);
+        if (!input) return;
+        input.addEventListener('input', function() {
+            const val = this.value.trim();
+            suggestions.innerHTML = '';
+            if (val.length < 1) { suggestions.style.display = 'none'; return; }
+            fetch('/api/usuarios/buscar?q=' + encodeURIComponent(val))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) { suggestions.style.display = 'none'; return; }
+                    data.forEach(nombre => {
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'list-group-item list-group-item-action';
+                        item.textContent = nombre;
+                        item.onclick = () => { input.value = nombre; suggestions.style.display = 'none'; };
+                        suggestions.appendChild(item);
+                    });
+                    suggestions.style.display = 'block';
+                });
+        });
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !suggestions.contains(e.target))
+                suggestions.style.display = 'none';
+        });
+    }
+
+    initAutocomplete('operadorInput', 'operadorSuggestions');
+    initAutocomplete('envasadoresInput', 'envasadoresSuggestions');
 </script>
 </body>
 </html>

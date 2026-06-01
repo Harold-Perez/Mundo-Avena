@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Monitoreo PCC2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f5f0e8; }
+        .navbar { background-color: #2d5a27; }
+        .btn-guardar { background-color: #2d5a27; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: 600; }
+        .btn-guardar:hover { background-color: #1e3d1a; color: white; }
+        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
+        .table thead th { background-color: #2d5a27; color: white; }
+        .total-field { background-color: #f0f7ee !important; font-weight: 600; }
+        .pcc-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+        .pcc-item { display: flex; flex-direction: column; align-items: center; }
+        .pcc-num { font-size: 10px; font-weight: 700; color: #2d5a27; margin-bottom: 2px; }
+        .pcc-input { width: 100%; text-align: center; font-size: 12px; padding: 4px; border: 1px solid #ced4da; border-radius: 4px; }
+        .list-group-item-action { cursor: pointer; }
+        .list-group-item-action:hover { background-color: #f0f7ee; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark px-4 py-3">
+    <span class="navbar-brand fw-bold">🌾 Mundo Avena</span>
+    <a href="/empleado/dashboard" class="btn btn-outline-light btn-sm">← Volver</a>
+</nav>
+
+<div class="container mt-4">
+    <h4 class="fw-bold mb-4">🔍 Monitoreo y Verificación del Proceso de Empaque y PCC2</h4>
+
+    <form th:action="@{/empleado/monitoreo}" method="post">
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">Información General</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Producto</label>
+                    <input type="text" class="form-control" name="producto"
+                           placeholder="Ej: Hojuela de Avena Nutremas 600g Promoción" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Lote PT</label>
+                    <input type="text" class="form-control" name="lotePT" placeholder="Ej: 0926HM26">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha Producción</label>
+                    <input type="date" class="form-control" name="fechaProduccion" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha Vencimiento</label>
+                    <input type="date" class="form-control" name="fechaVencimiento">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Lote MP Granel</label>
+                    <input type="text" class="form-control" name="loteMPGranel">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Cantidad MP (kg)</label>
+                    <input type="number" step="0.01" class="form-control" name="cantidadMPGranel">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Reproceso (kg)</label>
+                    <input type="number" step="0.01" class="form-control" name="reproceseMPGranel">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Total (kg)</label>
+                    <input type="number" step="0.01" class="form-control total-field" name="totalMPGranel">
+                </div>
+                <div class="col-md-6 position-relative">
+                    <label class="form-label fw-semibold">Personal de Calidad</label>
+                    <input type="text" class="form-control" name="personalCalidad"
+                           id="personalInput"
+                           placeholder="Escribe para buscar personal..."
+                           autocomplete="off">
+                    <div id="personalSuggestions" class="list-group position-absolute w-100"
+                         style="z-index:1000; display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📦 Tipo de Producto</h6>
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHojuelaAvena" value="true">
+                        <label class="form-check-label fw-semibold">Hojuela de Avena</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHarinaAvena" value="true">
+                        <label class="form-check-label fw-semibold">Harina de Avena</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHojuelaIntegral" value="true">
+                        <label class="form-check-label fw-semibold">Hojuela Integral</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esHarinaIntegral" value="true">
+                        <label class="form-check-label fw-semibold">Harina Integral</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="esOtro" value="true">
+                        <label class="form-check-label fw-semibold">Otro</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">🏭 Proceso de Empaque</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead>
+                    <tr>
+                        <th>Presentación y Cantidad</th>
+                        <th>Números de Lote</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><input type="text" class="form-control form-control-sm" name="empaque1Presentacion" placeholder="Ej: Bol. 600gr"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="empaque1Lote"></td>
+                        <td><input type="date" class="form-control form-control-sm" name="empaque1FechaInicio"></td>
+                        <td><input type="date" class="form-control form-control-sm" name="empaque1FechaFin"></td>
+                        <td><input type="time" class="form-control form-control-sm" name="empaque1HoraInicio"></td>
+                        <td><input type="time" class="form-control form-control-sm" name="empaque1HoraFin"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="form-control form-control-sm" name="empaque2Presentacion" placeholder="Ej: Saco. 40u"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="empaque2Lote"></td>
+                        <td><input type="date" class="form-control form-control-sm" name="empaque2FechaInicio"></td>
+                        <td><input type="date" class="form-control form-control-sm" name="empaque2FechaFin"></td>
+                        <td><input type="time" class="form-control form-control-sm" name="empaque2HoraInicio"></td>
+                        <td><input type="time" class="form-control form-control-sm" name="empaque2HoraFin"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">⚖️ Monitoreo Control de Pesos — Bolsas Individuales</h6>
+            <div class="pcc-grid">
+                <div class="pcc-item"><span class="pcc-num">1</span><input type="number" step="0.01" class="pcc-input" name="bolsa1"></div>
+                <div class="pcc-item"><span class="pcc-num">2</span><input type="number" step="0.01" class="pcc-input" name="bolsa2"></div>
+                <div class="pcc-item"><span class="pcc-num">3</span><input type="number" step="0.01" class="pcc-input" name="bolsa3"></div>
+                <div class="pcc-item"><span class="pcc-num">4</span><input type="number" step="0.01" class="pcc-input" name="bolsa4"></div>
+                <div class="pcc-item"><span class="pcc-num">5</span><input type="number" step="0.01" class="pcc-input" name="bolsa5"></div>
+                <div class="pcc-item"><span class="pcc-num">6</span><input type="number" step="0.01" class="pcc-input" name="bolsa6"></div>
+                <div class="pcc-item"><span class="pcc-num">7</span><input type="number" step="0.01" class="pcc-input" name="bolsa7"></div>
+                <div class="pcc-item"><span class="pcc-num">8</span><input type="number" step="0.01" class="pcc-input" name="bolsa8"></div>
+                <div class="pcc-item"><span class="pcc-num">9</span><input type="number" step="0.01" class="pcc-input" name="bolsa9"></div>
+                <div class="pcc-item"><span class="pcc-num">10</span><input type="number" step="0.01" class="pcc-input" name="bolsa10"></div>
+                <div class="pcc-item"><span class="pcc-num">11</span><input type="number" step="0.01" class="pcc-input" name="bolsa11"></div>
+                <div class="pcc-item"><span class="pcc-num">12</span><input type="number" step="0.01" class="pcc-input" name="bolsa12"></div>
+                <div class="pcc-item"><span class="pcc-num">13</span><input type="number" step="0.01" class="pcc-input" name="bolsa13"></div>
+                <div class="pcc-item"><span class="pcc-num">14</span><input type="number" step="0.01" class="pcc-input" name="bolsa14"></div>
+                <div class="pcc-item"><span class="pcc-num">15</span><input type="number" step="0.01" class="pcc-input" name="bolsa15"></div>
+                <div class="pcc-item"><span class="pcc-num">16</span><input type="number" step="0.01" class="pcc-input" name="bolsa16"></div>
+                <div class="pcc-item"><span class="pcc-num">17</span><input type="number" step="0.01" class="pcc-input" name="bolsa17"></div>
+                <div class="pcc-item"><span class="pcc-num">18</span><input type="number" step="0.01" class="pcc-input" name="bolsa18"></div>
+                <div class="pcc-item"><span class="pcc-num">19</span><input type="number" step="0.01" class="pcc-input" name="bolsa19"></div>
+                <div class="pcc-item"><span class="pcc-num">20</span><input type="number" step="0.01" class="pcc-input" name="bolsa20"></div>
+                <div class="pcc-item"><span class="pcc-num">21</span><input type="number" step="0.01" class="pcc-input" name="bolsa21"></div>
+                <div class="pcc-item"><span class="pcc-num">22</span><input type="number" step="0.01" class="pcc-input" name="bolsa22"></div>
+                <div class="pcc-item"><span class="pcc-num">23</span><input type="number" step="0.01" class="pcc-input" name="bolsa23"></div>
+                <div class="pcc-item"><span class="pcc-num">24</span><input type="number" step="0.01" class="pcc-input" name="bolsa24"></div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">⚖️ Monitoreo Control de Pesos — Sacos</h6>
+            <div class="pcc-grid">
+                <div class="pcc-item"><span class="pcc-num">1</span><input type="number" step="0.01" class="pcc-input" name="sacoM1"></div>
+                <div class="pcc-item"><span class="pcc-num">2</span><input type="number" step="0.01" class="pcc-input" name="sacoM2"></div>
+                <div class="pcc-item"><span class="pcc-num">3</span><input type="number" step="0.01" class="pcc-input" name="sacoM3"></div>
+                <div class="pcc-item"><span class="pcc-num">4</span><input type="number" step="0.01" class="pcc-input" name="sacoM4"></div>
+                <div class="pcc-item"><span class="pcc-num">5</span><input type="number" step="0.01" class="pcc-input" name="sacoM5"></div>
+                <div class="pcc-item"><span class="pcc-num">6</span><input type="number" step="0.01" class="pcc-input" name="sacoM6"></div>
+                <div class="pcc-item"><span class="pcc-num">7</span><input type="number" step="0.01" class="pcc-input" name="sacoM7"></div>
+                <div class="pcc-item"><span class="pcc-num">8</span><input type="number" step="0.01" class="pcc-input" name="sacoM8"></div>
+                <div class="pcc-item"><span class="pcc-num">9</span><input type="number" step="0.01" class="pcc-input" name="sacoM9"></div>
+                <div class="pcc-item"><span class="pcc-num">10</span><input type="number" step="0.01" class="pcc-input" name="sacoM10"></div>
+                <div class="pcc-item"><span class="pcc-num">11</span><input type="number" step="0.01" class="pcc-input" name="sacoM11"></div>
+                <div class="pcc-item"><span class="pcc-num">12</span><input type="number" step="0.01" class="pcc-input" name="sacoM12"></div>
+                <div class="pcc-item"><span class="pcc-num">13</span><input type="number" step="0.01" class="pcc-input" name="sacoM13"></div>
+                <div class="pcc-item"><span class="pcc-num">14</span><input type="number" step="0.01" class="pcc-input" name="sacoM14"></div>
+                <div class="pcc-item"><span class="pcc-num">15</span><input type="number" step="0.01" class="pcc-input" name="sacoM15"></div>
+                <div class="pcc-item"><span class="pcc-num">16</span><input type="number" step="0.01" class="pcc-input" name="sacoM16"></div>
+                <div class="pcc-item"><span class="pcc-num">17</span><input type="number" step="0.01" class="pcc-input" name="sacoM17"></div>
+                <div class="pcc-item"><span class="pcc-num">18</span><input type="number" step="0.01" class="pcc-input" name="sacoM18"></div>
+                <div class="pcc-item"><span class="pcc-num">19</span><input type="number" step="0.01" class="pcc-input" name="sacoM19"></div>
+                <div class="pcc-item"><span class="pcc-num">20</span><input type="number" step="0.01" class="pcc-input" name="sacoM20"></div>
+                <div class="pcc-item"><span class="pcc-num">21</span><input type="number" step="0.01" class="pcc-input" name="sacoM21"></div>
+                <div class="pcc-item"><span class="pcc-num">22</span><input type="number" step="0.01" class="pcc-input" name="sacoM22"></div>
+                <div class="pcc-item"><span class="pcc-num">23</span><input type="number" step="0.01" class="pcc-input" name="sacoM23"></div>
+                <div class="pcc-item"><span class="pcc-num">24</span><input type="number" step="0.01" class="pcc-input" name="sacoM24"></div>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">🔧 Verificación Detector de Metales PCC2</h6>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="detectorMetalesCumple" value="true" id="detector">
+                <label class="form-check-label fw-semibold" for="detector">✅ Cumple con especificaciones</label>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📊 Rendimiento</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Cantidad (kg)</th>
+                        <th>Producto Terminado (kg)</th>
+                        <th>Merma (kg)</th>
+                        <th>Reproceso (kg)</th>
+                        <th>Total (kg)</th>
+                        <th>%</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="fw-bold">Materia Prima</td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="mpCantidadKg" id="mpCant" oninput="calcRendMP()"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="mpProductoTerminadoKg" id="mpPT" oninput="calcRendMP()"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="mpMermaKg"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="mpReprocesoKg"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="mpTotalKg" id="mpTotal" readonly></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="mpRendimientoPct" id="mpRend" readonly></td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Material de Empaque</td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="empCantidadKg" id="empCant" oninput="calcRendEmp()"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="empProductoTerminadoKg" id="empPT" oninput="calcRendEmp()"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="empMermaKg"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm" name="empReprocesoKg"></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="empTotalKg" id="empTotal" readonly></td>
+                        <td><input type="number" step="0.01" class="form-control form-control-sm total-field" name="empRendimientoPct" id="empRend" readonly></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">📝 Observaciones</h6>
+            <textarea class="form-control" name="observaciones" rows="3"
+                      placeholder="Observaciones adicionales..."></textarea>
+        </div>
+
+        <div class="d-flex gap-2 mb-5">
+            <button type="submit" class="btn btn-guardar">💾 Guardar Registro</button>
+            <a href="/empleado/dashboard" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function calcRendMP() {
+        const cant = parseFloat(document.getElementById('mpCant').value) || 0;
+        const pt = parseFloat(document.getElementById('mpPT').value) || 0;
+        document.getElementById('mpTotal').value = cant.toFixed(2);
+        if (cant > 0) document.getElementById('mpRend').value = ((pt / cant) * 100).toFixed(2);
+    }
+
+    function calcRendEmp() {
+        const cant = parseFloat(document.getElementById('empCant').value) || 0;
+        const pt = parseFloat(document.getElementById('empPT').value) || 0;
+        document.getElementById('empTotal').value = cant.toFixed(2);
+        if (cant > 0) document.getElementById('empRend').value = ((pt / cant) * 100).toFixed(2);
+    }
+
+    function initAutocomplete(inputId, suggestionsId) {
+        const input = document.getElementById(inputId);
+        const suggestions = document.getElementById(suggestionsId);
+        if (!input) return;
+        input.addEventListener('input', function() {
+            const val = this.value.trim();
+            suggestions.innerHTML = '';
+            if (val.length < 1) { suggestions.style.display = 'none'; return; }
+            fetch('/api/usuarios/buscar?q=' + encodeURIComponent(val))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) { suggestions.style.display = 'none'; return; }
+                    data.forEach(nombre => {
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'list-group-item list-group-item-action';
+                        item.textContent = nombre;
+                        item.onclick = () => { input.value = nombre; suggestions.style.display = 'none'; };
+                        suggestions.appendChild(item);
+                    });
+                    suggestions.style.display = 'block';
+                });
+        });
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !suggestions.contains(e.target))
+                suggestions.style.display = 'none';
+        });
+    }
+
+    initAutocomplete('personalInput', 'personalSuggestions');
+</script>
+</body>
+</html>
