@@ -4,17 +4,26 @@
     <meta charset="UTF-8">
     <title>Preparación de Mezcla Premix</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/validaciones.js"></script>
     <style>
-        body { background-color: #f5f0e8; }
+        body { background-color: #f5f0e8; font-family: 'Segoe UI', sans-serif; }
         .navbar { background-color: #2d5a27; }
         .btn-guardar { background-color: #2d5a27; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: 600; }
         .btn-guardar:hover { background-color: #1e3d1a; color: white; }
         .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
-        .table thead th { background-color: #2d5a27; color: white; }
-        .num-carga { background-color: #2d5a27; color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+        .table thead th { background-color: #2d5a27; color: white; font-size: 12px; }
+        .table tbody td { font-size: 12px; vertical-align: middle; }
+        .total-row { background-color: #f0f7ee !important; font-weight: 700; }
+        .num-fila { background-color: #2d5a27; color: white; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+        .btn-agregar { background-color: #f0f7ee; color: #2d5a27; border: 1px dashed #2d5a27; padding: 6px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 12px; }
+        .btn-agregar:hover { background-color: #2d5a27; color: white; }
+        .btn-eliminar { background: none; border: none; color: #dc3545; font-size: 16px; cursor: pointer; }
         .list-group-item-action { cursor: pointer; }
         .list-group-item-action:hover { background-color: #f0f7ee; }
+        .pct-input { color: #b28c65; font-weight: 600; }
+        .total-field { background-color: #f0f7ee !important; font-weight: 600; color: #2d5a27 !important; }
+        .table thead tr th[style] { color: inherit !important; }
     </style>
 </head>
 <body>
@@ -23,116 +32,266 @@
     <a href="/empleado/dashboard" class="btn btn-outline-light btn-sm">← Volver</a>
 </nav>
 
-<div class="container mt-4">
-    <h4 class="fw-bold mb-4">🧪 Preparación de Mezcla Premix</h4>
+<div class="container mt-4 pb-5">
+
+    <div class="text-center mb-4">
+        <h6 class="text-muted fw-semibold">MANUAL DE PROCEDIMIENTOS – ÁREA DE GESTIÓN DE CALIDAD</h6>
+        <h4 class="fw-bold" style="color:#2d5a27;">🧪 PREPARACIÓN DE MEZCLA PREMIX</h4>
+    </div>
 
     <form th:action="@{/empleado/premix}" method="post">
 
+        <!-- Datos generales -->
         <div class="card p-4 mb-4">
-            <h6 class="section-title">Información General</h6>
+            <h6 class="section-title">Datos Generales</h6>
             <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold">Fecha</label>
-                    <input type="date" class="form-control" name="fecha" required>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha de Inicio</label>
+                    <input type="date" class="form-control" name="fechaInicio" required>
                 </div>
-                <div class="col-md-8 position-relative">
-                    <label class="form-label fw-semibold">Operador Responsable</label>
-                    <input type="text" class="form-control" name="operador" id="operadorInput"
-                           placeholder="Escribe para buscar operador..." autocomplete="off">
-                    <div id="operadorSuggestions" class="list-group position-absolute w-100"
-                         style="z-index:1000; display:none;"></div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fecha de Finalización</label>
+                    <input type="date" class="form-control" name="fechaFin">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Hora de Inicio</label>
+                    <input type="time" class="form-control" name="horaInicio" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Hora de Finalización</label>
+                    <input type="time" class="form-control" name="horaFin">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label fw-semibold">Operadores</label>
+                    <div class="border rounded p-2 mb-1" id="operadoresSeleccionados"
+                         style="min-height:38px; background:white; display:flex; flex-wrap:wrap; gap:4px;"></div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="operadorSearch"
+                               placeholder="Escribe para agregar operador..." autocomplete="off">
+                        <div id="operadorSuggestions" class="list-group position-absolute w-100"
+                             style="z-index:1000; display:none;"></div>
+                    </div>
+                    <input type="hidden" name="operador" id="operadoresHidden">
                 </div>
             </div>
         </div>
 
+        <!-- Sección 3.1 -->
         <div class="card p-4 mb-4">
-            <h6 class="section-title">📋 Registro de Cargas</h6>
-            <p class="text-muted small mb-3">Mezclar durante 8 minutos por carga. Flujo de premix: 110.2 kg/h</p>
+            <h6 class="section-title">3.1 Cantidades para la Mezcla Premix</h6>
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Lote Premix</label>
+                    <input type="text" class="form-control" name="lotePremix"
+                           placeholder="Ej: 2726PX / 14a">
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
                     <thead>
                     <tr>
-                        <th style="width:8%">No. Carga</th>
-                        <th>Presentación</th>
-                        <th>Lote</th>
-                        <th>Hora Inicio</th>
-                        <th>Hora Fin</th>
+                        <th rowspan="2" style="width:40px; vertical-align:middle; background:#2d5a27; color:white;">No.</th>
+                        <th colspan="2" style="background:#e8f5e9 !important; color:#2d5a27 !important;">Harina de Avena</th>
+                        <th colspan="2" style="background:#fff8e1 !important; color:#b28c65 !important;">Carbonato de Calcio</th>
+                        <th colspan="2" style="background:#fce4ec !important; color:#c0392b !important;">Vitaminas</th>
+                        <th rowspan="2" style="vertical-align:middle; background:#2d5a27; color:white;">Devolución a Bodega</th>
+                        <th rowspan="2" style="width:30px; background:#2d5a27;"></th>
+                    </tr>
+                    <tr>
+                        <th style="background:#e8f5e9 !important; color:#2d5a27 !important;">Lote</th>
+                        <th style="background:#e8f5e9 !important; color:#2d5a27 !important;">Cantidad (kg)</th>
+                        <th style="background:#fff8e1 !important; color:#b28c65 !important;">Lote</th>
+                        <th style="background:#fff8e1 !important; color:#b28c65 !important;">Cantidad (kg)</th>
+                        <th style="background:#fce4ec !important; color:#c0392b !important;">Lote</th>
+                        <th style="background:#fce4ec !important; color:#c0392b !important;">Cantidad (kg)</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td class="text-center"><span class="num-carga">1</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion1" placeholder="Ej: 600"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote1"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio1"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin1"></td>
+                        <td class="fw-bold" style="color:#2d5a27;">Vitamina</td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control form-control-sm pct-input"
+                                   name="pctVitamina" id="pctVitamina" value="2.7"
+                                   oninput="calcTotales31()">
+                        </td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm"
+                                   name="cantVitamina1" oninput="calcTotales31()"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm"
+                                   name="cantVitamina2" oninput="calcTotales31()"></td>
                     </tr>
                     <tr>
-                        <td class="text-center"><span class="num-carga">2</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion2"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote2"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio2"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin2"></td>
+                        <td class="fw-bold" style="color:#2d5a27;">Carbonato</td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control form-control-sm pct-input"
+                                   name="pctCarbonato" id="pctCarbonato" value="70.0"
+                                   oninput="calcTotales31()">
+                        </td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm"
+                                   name="cantCarbonato1" oninput="calcTotales31()"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm"
+                                   name="cantCarbonato2" oninput="calcTotales31()"></td>
                     </tr>
                     <tr>
-                        <td class="text-center"><span class="num-carga">3</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion3"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote3"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio3"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin3"></td>
+                        <td class="fw-bold" style="color:#2d5a27;">Harina</td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control form-control-sm pct-input"
+                                   name="pctHarina" id="pctHarina" value="27.3"
+                                   oninput="calcTotales31()">
+                        </td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm"
+                                   name="cantHarina1" oninput="calcTotales31()"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm"
+                                   name="cantHarina2" oninput="calcTotales31()"></td>
                     </tr>
-                    <tr>
-                        <td class="text-center"><span class="num-carga">4</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion4"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote4"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio4"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin4"></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><span class="num-carga">5</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion5"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote5"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio5"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin5"></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><span class="num-carga">6</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion6"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote6"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio6"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin6"></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><span class="num-carga">7</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion7"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote7"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio7"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin7"></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><span class="num-carga">8</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion8"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote8"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio8"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin8"></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><span class="num-carga">9</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion9"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote9"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio9"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin9"></td>
-                    </tr>
-                    <tr>
-                        <td class="text-center"><span class="num-carga">10</span></td>
-                        <td><input type="text" class="form-control form-control-sm" name="presentacion10"></td>
-                        <td><input type="text" class="form-control form-control-sm" name="lote10"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaInicio10"></td>
-                        <td><input type="time" class="form-control form-control-sm" name="horaFin10"></td>
+                    <tr class="total-row">
+                        <td class="fw-bold">Total</td>
+                        <td>
+                            <input type="number" step="0.01" class="form-control form-control-sm total-field"
+                                   name="pctTotal" id="pctTotal" readonly>
+                        </td>
+                        <td>
+                            <input type="number" step="0.001" class="form-control form-control-sm total-field"
+                                   name="cantTotal1" id="cantTotal1" readonly>
+                        </td>
+                        <td>
+                            <input type="number" step="0.001" class="form-control form-control-sm total-field"
+                                   name="cantTotal2" id="cantTotal2" readonly>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Sección 3.2 -->
+        <div class="card p-4 mb-4">
+            <h6 class="section-title">3.2 Lotes de Materia Prima</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm" id="tablaMateriasPrimas">
+                    <thead>
+                    <tr>
+                        <th rowspan="2" style="width:40px; vertical-align:middle;">No.</th>
+                        <th colspan="2" style="background:#e8f5e9; color:#2d5a27;">Harina de Avena</th>
+                        <th colspan="2" style="background:#fff8e1; color:#b28c65;">Carbonato de Calcio</th>
+                        <th colspan="2" style="background:#fce4ec; color:#c0392b;">Vitaminas</th>
+                        <th rowspan="2" style="vertical-align:middle;">Devolución a Bodega</th>
+                        <th rowspan="2" style="width:30px;"></th>
+                    </tr>
+                    <tr>
+                        <th style="background:#e8f5e9;">Lote</th>
+                        <th style="background:#e8f5e9;">Cantidad (kg)</th>
+                        <th style="background:#fff8e1;">Lote</th>
+                        <th style="background:#fff8e1;">Cantidad (kg)</th>
+                        <th style="background:#fce4ec;">Lote</th>
+                        <th style="background:#fce4ec;">Cantidad (kg)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="mpBody">
+                    <tr>
+                        <td class="text-center"><span class="num-fila">1</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp1"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp1"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp1"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp1"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp1"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp1"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega1"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">2</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp2"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp2"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp2"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp2"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp2"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp2"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega2"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">3</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp3"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp3"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp3"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp3"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp3"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp3"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega3"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">4</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp4"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp4"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp4"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp4"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp4"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp4"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega4"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">5</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp5"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp5"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp5"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp5"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp5"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp5"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega5"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">6</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp6"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp6"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp6"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp6"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp6"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp6"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega6"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">7</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp7"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp7"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp7"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp7"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp7"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp7"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega7"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">8</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp8"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp8"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp8"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp8"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp8"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp8"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega8"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center"><span class="num-fila">9</span></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp9"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp9"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp9"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp9"></td>
+                        <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp9"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp9"></td>
+                        <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega9"></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="btn-agregar mt-2" onclick="agregarFilaMP()">
+                + Agregar fila
+            </button>
         </div>
 
         <div class="card p-4 mb-4">
@@ -142,18 +301,81 @@
         </div>
 
         <div class="d-flex gap-2 mb-5">
-            <button type="submit" class="btn btn-guardar">💾 Guardar Registro</button>
+            <button type="submit" class="btn-guardar">💾 Guardar Registro</button>
             <a href="/empleado/dashboard" class="btn btn-outline-secondary">Cancelar</a>
         </div>
     </form>
 </div>
 
 <script>
-    function initAutocomplete(inputId, suggestionsId) {
-        const input = document.getElementById(inputId);
+    function calcTotales31() {
+        const v1 = parseFloat(document.querySelector('[name="cantVitamina1"]')?.value) || 0;
+        const c1 = parseFloat(document.querySelector('[name="cantCarbonato1"]')?.value) || 0;
+        const h1 = parseFloat(document.querySelector('[name="cantHarina1"]')?.value) || 0;
+        document.getElementById('cantTotal1').value = (v1 + c1 + h1).toFixed(3);
+
+        const v2 = parseFloat(document.querySelector('[name="cantVitamina2"]')?.value) || 0;
+        const c2 = parseFloat(document.querySelector('[name="cantCarbonato2"]')?.value) || 0;
+        const h2 = parseFloat(document.querySelector('[name="cantHarina2"]')?.value) || 0;
+        document.getElementById('cantTotal2').value = (v2 + c2 + h2).toFixed(3);
+
+        const pv = parseFloat(document.getElementById('pctVitamina')?.value) || 0;
+        const pc = parseFloat(document.getElementById('pctCarbonato')?.value) || 0;
+        const ph = parseFloat(document.getElementById('pctHarina')?.value) || 0;
+        document.getElementById('pctTotal').value = (pv + pc + ph).toFixed(1);
+    }
+
+    // Inicializar totales al cargar
+    calcTotales31();
+
+    // Agregar fila dinámica sección 3.2
+    let numFilaMP = 9;
+    function agregarFilaMP() {
+        numFilaMP++;
+        const n = numFilaMP;
+        const tbody = document.getElementById('mpBody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-center"><span class="num-fila">${n}</span></td>
+            <td><input type="text" class="form-control form-control-sm" name="loteHarinaMp${n}"></td>
+            <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantHarinaMp${n}"></td>
+            <td><input type="text" class="form-control form-control-sm" name="loteCarbonatoMp${n}"></td>
+            <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantCarbonatoMp${n}"></td>
+            <td><input type="text" class="form-control form-control-sm" name="loteVitaminasMp${n}"></td>
+            <td><input type="number" step="0.001" class="form-control form-control-sm" name="cantVitaminasMp${n}"></td>
+            <td><input type="number" step="0.001" class="form-control form-control-sm" name="devBodega${n}"></td>
+            <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove()">✕</button></td>`;
+        tbody.appendChild(tr);
+    }
+
+    // Multiselect operadores
+    function initMultiSelect(searchId, suggestionsId, selectedDivId, hiddenId) {
+        const search = document.getElementById(searchId);
         const suggestions = document.getElementById(suggestionsId);
-        if (!input) return;
-        input.addEventListener('input', function() {
+        const selectedDiv = document.getElementById(selectedDivId);
+        const hidden = document.getElementById(hiddenId);
+        let selected = [];
+
+        function updateHidden() { hidden.value = selected.join(', '); }
+
+        function addTag(nombre) {
+            if (selected.includes(nombre)) return;
+            selected.push(nombre);
+            const tag = document.createElement('span');
+            tag.style.cssText = 'background:#2d5a27; color:white; padding:4px 8px; border-radius:6px; font-size:12px; display:flex; align-items:center; gap:4px;';
+            tag.innerHTML = `${nombre} <button type="button" style="background:none;border:none;color:white;padding:0;font-size:14px;line-height:1;cursor:pointer;">×</button>`;
+            tag.querySelector('button').onclick = () => {
+                tag.remove();
+                selected = selected.filter(v => v !== nombre);
+                updateHidden();
+            };
+            selectedDiv.appendChild(tag);
+            updateHidden();
+            search.value = '';
+            suggestions.style.display = 'none';
+        }
+
+        search.addEventListener('input', function() {
             const val = this.value.trim();
             suggestions.innerHTML = '';
             if (val.length < 1) { suggestions.style.display = 'none'; return; }
@@ -166,19 +388,20 @@
                         item.type = 'button';
                         item.className = 'list-group-item list-group-item-action';
                         item.textContent = nombre;
-                        item.onclick = () => { input.value = nombre; suggestions.style.display = 'none'; };
+                        item.onclick = () => addTag(nombre);
                         suggestions.appendChild(item);
                     });
                     suggestions.style.display = 'block';
                 });
         });
+
         document.addEventListener('click', function(e) {
-            if (!input.contains(e.target) && !suggestions.contains(e.target))
+            if (!search.contains(e.target) && !suggestions.contains(e.target))
                 suggestions.style.display = 'none';
         });
     }
 
-    initAutocomplete('operadorInput', 'operadorSuggestions');
+    initMultiSelect('operadorSearch', 'operadorSuggestions', 'operadoresSeleccionados', 'operadoresHidden');
 </script>
 </body>
 </html>

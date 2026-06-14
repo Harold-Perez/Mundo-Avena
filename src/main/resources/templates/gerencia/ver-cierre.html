@@ -2,137 +2,232 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Ver Cierre Mensual</title>
+    <title>Ver Cierre Mensual — Mundo Avena</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f5f0e8; }
-        .navbar { background-color: #2d5a27; }
-        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
-        .table thead th { background-color: #2d5a27; color: white; }
-        .costo-unitario { color: #d4a017; font-weight: 700; font-size: 16px; }
-        .badge-borrador { background-color: #d4a017; }
-        .total-row { background-color: #f0f7ee; font-weight: 700; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f0e8; font-family: 'Segoe UI', sans-serif; }
+
+        .navbar { background: #2d5a27; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-logo { background: white; border-radius: 6px; padding: 5px 10px; }
+        .nav-logo img { height: 26px; object-fit: contain; }
+        .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+        .nav-role { color: #b28c65; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-right { display: flex; gap: 8px; align-items: center; }
+        .nav-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); color: white; text-decoration: none; }
+
+        .content { padding: 28px; }
+
+        .cierre-header { background: white; border-radius: 14px; padding: 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .cierre-titulo { font-size: 22px; font-weight: 700; color: #1a2e1a; margin-bottom: 6px; }
+        .badge-confirmado { background: #f0f7ee; color: #2d5a27; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; display: inline-block; }
+        .badge-borrador { background: #fff8e1; color: #b28c65; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; display: inline-block; }
+        .btn-confirmar { background: #2d5a27; color: white; border: none; border-radius: 10px; padding: 10px 24px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-confirmar:hover { background: #1e3d1a; transform: translateY(-1px); }
+
+        .alerta-exito { background: #f0f7ee; border-left: 4px solid #2d5a27; border-radius: 8px; padding: 12px 16px; color: #2d5a27; font-size: 13px; margin-bottom: 20px; }
+
+        .params-card { background: white; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+        .params-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #b28c65; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #f0ebe3; }
+        .param-item { text-align: center; padding: 12px; background: #faf9f7; border-radius: 10px; }
+        .param-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        .param-value { font-size: 15px; font-weight: 700; color: #2d5a27; }
+
+        .tabla-card { background: white; border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+        .tabla-head { background: #1a2e1a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .tabla-head-title { color: white; font-size: 13px; font-weight: 600; }
+        .tabla-head-badge { background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead th { background: #f5f0e8; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #2d5a27; padding: 9px 14px; letter-spacing: 0.5px; text-align: right; }
+        thead th:first-child { text-align: left; }
+        tbody td { font-size: 12px; color: #444; padding: 10px 14px; border-bottom: 1px solid #f5f0e8; text-align: right; }
+        tbody td:first-child { text-align: left; font-weight: 600; color: #1a2e1a; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #faf9f7; }
+
+        .q-unidad { color: #2d5a27; font-weight: 700; font-size: 13px; }
+        .usd-unidad { color: #185FA5; font-weight: 700; font-size: 13px; }
+        .costo-total { color: #1a2e1a; font-weight: 700; }
+
+        .sin-registros { text-align: center; color: #aaa; padding: 32px; font-size: 13px; }
+
+        .resumen-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+        .resumen-stat { background: white; border-radius: 12px; padding: 18px; border-top: 3px solid; text-align: center; }
+        .resumen-stat.v { border-top-color: #2d5a27; }
+        .resumen-stat.g { border-top-color: #b28c65; }
+        .resumen-stat.a { border-top-color: #185FA5; }
+        .resumen-stat.r { border-top-color: #A32D2D; }
+        .resumen-n { font-size: 22px; font-weight: 700; color: #1a2e1a; }
+        .resumen-l { font-size: 10px; color: #aaa; margin-top: 2px; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark px-4 py-3">
-    <span class="navbar-brand fw-bold">🌾 Mundo Avena - Gerencia</span>
-    <div class="d-flex gap-3">
-        <a href="/gerencia/costos" class="btn btn-outline-light btn-sm">← Volver</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="nav-logo">
+            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+        </div>
+        <div class="nav-sep"></div>
+        <div class="nav-role">Gerencia</div>
+    </div>
+    <div class="nav-right">
+        <a href="/gerencia/costos" class="nav-btn">← Volver</a>
+        <a href="/gerencia/dashboard" class="nav-btn">Dashboard</a>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="nav-btn" style="cursor:pointer;">Cerrar Sesión</button>
         </form>
     </div>
 </nav>
 
-<div class="container mt-4">
-    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
+<div class="content">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div th:if="${exito}" class="alerta-exito">
+        ✅ <span th:text="${exito}"></span>
+    </div>
+
+    <!-- Header del cierre -->
+    <div class="cierre-header">
         <div>
-            <h4 class="fw-bold mb-1">
+            <div class="cierre-titulo">
                 💰 Cierre Mensual —
-                <span th:text="${cierre.mes}"></span>/
+                <span th:text="${cierre.mes}"></span> /
                 <span th:text="${cierre.anio}"></span>
-            </h4>
-            <span th:if="${cierre.estado.name() == 'CONFIRMADO'}"
-                  class="badge bg-success">✅ Confirmado</span>
-            <span th:if="${cierre.estado.name() == 'BORRADOR'}"
-                  class="badge bg-warning text-dark">⏳ Borrador</span>
+            </div>
+            <span th:if="${cierre.estado.name() == 'CONFIRMADO'}" class="badge-confirmado">✅ Confirmado</span>
+            <span th:if="${cierre.estado.name() == 'BORRADOR'}" class="badge-borrador">⏳ Borrador</span>
+            <span style="font-size:12px; color:#aaa; margin-left:12px;"
+                  th:text="'Calculado por: ' + ${cierre.calculadoPor?.nombreCompleto} + ' — ' + ${#temporals.format(cierre.fechaCalculo, 'dd/MM/yyyy HH:mm')}">
+            </span>
         </div>
         <form th:if="${cierre.estado.name() == 'BORRADOR'}"
               th:action="@{/gerencia/costos/confirmar/{id}(id=${cierre.id})}"
-              method="post">
-            <button type="submit" class="btn btn-success fw-bold"
-                    onclick="return confirm('¿Confirmar este cierre mensual?')">
+              method="post" class="m-0">
+            <button type="submit" class="btn-confirmar"
+                    onclick="return confirm('¿Confirmar este cierre mensual? Esta acción no se puede deshacer.')">
                 ✅ Confirmar Cierre
             </button>
         </form>
     </div>
 
-    <!-- Parámetros del cierre -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">⚙️ Parámetros Utilizados</h6>
+    <!-- Resumen totales -->
+    <div class="resumen-grid" th:unless="${#lists.isEmpty(detalles)}">
+        <div class="resumen-stat v">
+            <div class="resumen-n" th:text="${#lists.size(detalles)}">0</div>
+            <div class="resumen-l">Productos calculados</div>
+        </div>
+        <div class="resumen-stat g">
+            <div class="resumen-n" th:text="${totalCostoMes}">Q0</div>
+            <div class="resumen-l">Costo total del mes</div>
+        </div>
+        <div class="resumen-stat a">
+            <div class="resumen-n" th:text="${cierre.costoAvenaKg}">0</div>
+            <div class="resumen-l">Q/kg avena utilizado</div>
+        </div>
+        <div class="resumen-stat r">
+            <div class="resumen-n" th:text="'Q' + ${cierre.tipoCambio}">0</div>
+            <div class="resumen-l">Tipo de cambio</div>
+        </div>
+    </div>
+
+    <!-- Parámetros -->
+    <div class="params-card">
+        <div class="params-title">⚙️ Parámetros Utilizados</div>
         <div class="row g-3">
-            <div class="col-md-2">
-                <small class="text-muted">Avena (Q/kg)</small>
-                <div class="fw-bold" th:text="${cierre.costoAvenaKg}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">Avena (Q/kg)</div>
+                    <div class="param-value" th:text="${cierre.costoAvenaKg}"></div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <small class="text-muted">Harina (Q/kg)</small>
-                <div class="fw-bold" th:text="${cierre.costoHarinaKg}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">Harina (Q/kg)</div>
+                    <div class="param-value" th:text="${cierre.costoHarinaKg}"></div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <small class="text-muted">Carbonato (Q/kg)</small>
-                <div class="fw-bold" th:text="${cierre.costoCarbonatoKg}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">Carbonato (Q/kg)</div>
+                    <div class="param-value" th:text="${cierre.costoCarbonatoKg}"></div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <small class="text-muted">Vitaminas (Q/kg)</small>
-                <div class="fw-bold" th:text="${cierre.costoVitaminasKg}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">Vitaminas (Q/kg)</div>
+                    <div class="param-value" th:text="${cierre.costoVitaminasKg}"></div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <small class="text-muted">EE (Q/kg)</small>
-                <div class="fw-bold" th:text="${cierre.costoEEPorKg}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">EE (Q/kg)</div>
+                    <div class="param-value" th:text="${cierre.costoEEPorKg}"></div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <small class="text-muted">Vapor (Q/kg)</small>
-                <div class="fw-bold" th:text="${cierre.costoVaporPorKg}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">Vapor (Q/kg)</div>
+                    <div class="param-value" th:text="${cierre.costoVaporPorKg}"></div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <small class="text-muted">Mano de Obra (Q/kg)</small>
-                <div class="fw-bold" th:text="${cierre.costoMOPorKg}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">Mano de Obra (Q/kg)</div>
+                    <div class="param-value" th:text="${cierre.costoMOPorKg}"></div>
+                </div>
             </div>
-            <div class="col-md-2">
-                <small class="text-muted">Tipo de Cambio</small>
-                <div class="fw-bold" th:text="'Q' + ${cierre.tipoCambio}"></div>
-            </div>
-            <div class="col-md-2">
-                <small class="text-muted">Calculado por</small>
-                <div class="fw-bold" th:text="${cierre.calculadoPor?.nombreCompleto}"></div>
-            </div>
-            <div class="col-md-2">
-                <small class="text-muted">Fecha Cálculo</small>
-                <div class="fw-bold" th:text="${#temporals.format(cierre.fechaCalculo, 'dd/MM/yyyy HH:mm')}"></div>
+            <div class="col-md-2 col-sm-4">
+                <div class="param-item">
+                    <div class="param-label">Tipo de Cambio</div>
+                    <div class="param-value" th:text="'Q' + ${cierre.tipoCambio}"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Tabla de costos por producto -->
-    <div class="card p-4 mb-5">
-        <h6 class="section-title">📊 Costo Variable Directo por Producto</h6>
-        <div th:if="${#lists.isEmpty(detalles)}" class="alert alert-warning">
-            No hay registros de Control Diario PT para este período.
+    <!-- Tabla costos -->
+    <div class="tabla-card">
+        <div class="tabla-head">
+            <span class="tabla-head-title">📊 Costo Variable Directo por Producto</span>
+            <span class="tabla-head-badge" th:text="${#lists.size(detalles)} + ' productos'"></span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(detalles)}" class="sin-registros">
+            ⚠️ No hay registros de Control Diario PT para este período.
             Los empleados deben registrar producción para calcular costos.
         </div>
+
         <div th:unless="${#lists.isEmpty(detalles)}" class="table-responsive">
-            <table class="table table-hover table-bordered mb-0">
+            <table>
                 <thead>
                 <tr>
-                    <th>Producto</th>
-                    <th class="text-end">Unidades</th>
-                    <th class="text-end">Kg Prod.</th>
-                    <th class="text-end">Costo MP (Q)</th>
-                    <th class="text-end">Costo EE (Q)</th>
-                    <th class="text-end">Costo Vapor (Q)</th>
-                    <th class="text-end">Costo MO (Q)</th>
-                    <th class="text-end">Costo Total (Q)</th>
-                    <th class="text-end">Q/Unidad</th>
-                    <th class="text-end">$/Unidad</th>
+                    <th style="text-align:left;">Producto</th>
+                    <th>Unidades</th>
+                    <th>Kg Prod.</th>
+                    <th>Costo MP (Q)</th>
+                    <th>Costo EE (Q)</th>
+                    <th>Costo Vapor (Q)</th>
+                    <th>Costo MO (Q)</th>
+                    <th>Costo Total (Q)</th>
+                    <th>Q/Unidad</th>
+                    <th>$/Unidad</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="d : ${detalles}">
                     <td th:text="${d.producto}"></td>
-                    <td class="text-end" th:text="${#numbers.formatInteger(d.unidadesProducidas, 1, 'COMMA')}"></td>
-                    <td class="text-end" th:text="${#numbers.formatDecimal(d.kgProducidos, 1, 2)}"></td>
-                    <td class="text-end" th:text="${'Q' + #numbers.formatDecimal(d.costoAvena, 1, 2)}"></td>
-                    <td class="text-end" th:text="${'Q' + #numbers.formatDecimal(d.costoEE, 1, 2)}"></td>
-                    <td class="text-end" th:text="${'Q' + #numbers.formatDecimal(d.costoVapor, 1, 2)}"></td>
-                    <td class="text-end" th:text="${'Q' + #numbers.formatDecimal(d.costoMO, 1, 2)}"></td>
-                    <td class="text-end fw-bold" th:text="${'Q' + #numbers.formatDecimal(d.costoTotalQ, 1, 2)}"></td>
-                    <td class="text-end costo-unitario" th:text="${'Q' + #numbers.formatDecimal(d.costoUnitarioQ, 1, 4)}"></td>
-                    <td class="text-end costo-unitario" th:text="${'$' + #numbers.formatDecimal(d.costoUnitarioUSD, 1, 4)}"></td>
+                    <td th:text="${#numbers.formatInteger(d.unidadesProducidas, 1, 'COMMA')}"></td>
+                    <td th:text="${#numbers.formatDecimal(d.kgProducidos, 1, 2)}"></td>
+                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoAvena, 1, 2)}"></td>
+                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoEE, 1, 2)}"></td>
+                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoVapor, 1, 2)}"></td>
+                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoMO, 1, 2)}"></td>
+                    <td class="costo-total" th:text="${'Q' + #numbers.formatDecimal(d.costoTotalQ, 1, 2)}"></td>
+                    <td class="q-unidad" th:text="${'Q' + #numbers.formatDecimal(d.costoUnitarioQ, 1, 4)}"></td>
+                    <td class="usd-unidad" th:text="${'$' + #numbers.formatDecimal(d.costoUnitarioUSD, 1, 4)}"></td>
                 </tr>
                 </tbody>
             </table>

@@ -2,174 +2,238 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Historial de Registros</title>
+    <title>Historial — Mundo Avena</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f5f0e8; }
-        .navbar { background-color: #2d5a27; }
-        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
-        .table thead th { background-color: #2d5a27; color: white; }
-        .btn-buscar { background-color: #2d5a27; color: white; border: none; padding: 8px 24px; border-radius: 8px; font-weight: 600; }
-        .btn-buscar:hover { background-color: #1e3d1a; color: white; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f0e8; font-family: 'Segoe UI', sans-serif; }
+
+        .navbar { background: #2d5a27; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-logo { background: white; border-radius: 6px; padding: 5px 10px; }
+        .nav-logo img { height: 26px; object-fit: contain; }
+        .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+        .nav-role { color: #b28c65; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-right { display: flex; gap: 8px; align-items: center; }
+        .nav-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); color: white; text-decoration: none; }
+        .nav-btn-gold { background: #b28c65; border-color: #b28c65; color: white; font-weight: 600; border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
+        .nav-btn-gold:hover { background: #9a7654; color: white; text-decoration: none; }
+
+        .content { padding: 28px; }
+        .page-badge { display: inline-block; background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 3px 12px; border-radius: 20px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .page-title { font-size: 22px; font-weight: 700; color: #1a2e1a; margin: 0 0 2px; }
+        .page-sub { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+
+        .filtro-card { background: white; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
+        .filtro-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #b28c65; margin-bottom: 14px; }
+        .form-label { font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: block; }
+        .form-control { border: 1.5px solid #e0d8ce; border-radius: 8px; padding: 8px 12px; font-size: 12px; background: #faf9f7; width: 100%; }
+        .form-control:focus { border-color: #2d5a27; outline: none; box-shadow: 0 0 0 3px rgba(45,90,39,0.1); }
+        select.form-control { appearance: none; cursor: pointer; }
+        .btn-buscar { background: #2d5a27; color: white; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .btn-buscar:hover { background: #1e3d1a; }
+
+        .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+        .stat { background: white; border-radius: 12px; padding: 16px; text-align: center; border-top: 3px solid; }
+        .stat.v { border-top-color: #2d5a27; }
+        .stat.g { border-top-color: #b28c65; }
+        .stat.a { border-top-color: #185FA5; }
+        .stat.r { border-top-color: #A32D2D; }
+        .stat-n { font-size: 28px; font-weight: 700; color: #1a2e1a; }
+        .stat-l { font-size: 10px; color: #aaa; margin-top: 2px; }
+
+        .tabla-card { background: white; border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
+        .tabla-head { background: #1a2e1a; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+        .tabla-head-title { color: white; font-size: 12px; font-weight: 600; }
+        .tabla-head-badge { background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead th { background: #f5f0e8; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #2d5a27; padding: 8px 14px; letter-spacing: 0.5px; }
+        tbody td { font-size: 12px; color: #444; padding: 9px 14px; border-bottom: 1px solid #f5f0e8; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #faf9f7; }
+        .sin-registros { text-align: center; color: #ccc; padding: 20px; font-size: 12px; }
+        .badge-fecha { background: #f0f7ee; color: #2d5a27; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+
+        .resumen-card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+        .resumen-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #b28c65; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #f0ebe3; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark px-4 py-3">
-    <span class="navbar-brand fw-bold">🌾 Mundo Avena - Gerencia</span>
-    <div class="d-flex gap-3">
-        <a href="/gerencia/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
-        <a href="/gerencia/costos" class="btn btn-warning btn-sm fw-bold">💰 Costos</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="nav-logo">
+            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+        </div>
+        <div class="nav-sep"></div>
+        <div class="nav-role">Gerencia</div>
+    </div>
+    <div class="nav-right">
+        <a href="/gerencia/dashboard" class="nav-btn">← Dashboard</a>
+        <a href="/gerencia/costos" class="nav-btn-gold">💰 Costos</a>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="nav-btn" style="cursor:pointer;">Cerrar Sesión</button>
         </form>
     </div>
 </nav>
 
-<div class="container mt-4">
-    <h4 class="fw-bold mb-4">📋 Historial de Registros</h4>
+<div class="content">
+    <div class="page-badge">Gerencia</div>
+    <div class="page-title">📋 Historial de Registros</div>
+    <div class="page-sub">Consulta los registros de producción por fecha o mes</div>
 
-    <!-- Filtro por fecha -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">🔍 Buscar por Fecha</h6>
-        <form th:action="@{/gerencia/historial}" method="get" class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Fecha específica</label>
-                <input type="date" class="form-control" name="fecha" th:value="${fecha}">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label fw-semibold">Mes</label>
-                <select class="form-select" name="mes">
-                    <option value="1"  th:selected="${mes == 1}">Enero</option>
-                    <option value="2"  th:selected="${mes == 2}">Febrero</option>
-                    <option value="3"  th:selected="${mes == 3}">Marzo</option>
-                    <option value="4"  th:selected="${mes == 4}">Abril</option>
-                    <option value="5"  th:selected="${mes == 5}">Mayo</option>
-                    <option value="6"  th:selected="${mes == 6}">Junio</option>
-                    <option value="7"  th:selected="${mes == 7}">Julio</option>
-                    <option value="8"  th:selected="${mes == 8}">Agosto</option>
-                    <option value="9"  th:selected="${mes == 9}">Septiembre</option>
-                    <option value="10" th:selected="${mes == 10}">Octubre</option>
-                    <option value="11" th:selected="${mes == 11}">Noviembre</option>
-                    <option value="12" th:selected="${mes == 12}">Diciembre</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label fw-semibold">Año</label>
-                <input type="number" class="form-control" name="anio" th:value="${anio}">
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-buscar w-100">🔍 Buscar</button>
+    <!-- Filtros -->
+    <div class="filtro-card">
+        <div class="filtro-title">Buscar registros</div>
+        <form th:action="@{/gerencia/historial}" method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Fecha específica</label>
+                    <input type="date" class="form-control" name="fecha" th:value="${fecha}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Mes</label>
+                    <select class="form-control" name="mes">
+                        <option value="1"  th:selected="${mes == 1}">Enero</option>
+                        <option value="2"  th:selected="${mes == 2}">Febrero</option>
+                        <option value="3"  th:selected="${mes == 3}">Marzo</option>
+                        <option value="4"  th:selected="${mes == 4}">Abril</option>
+                        <option value="5"  th:selected="${mes == 5}">Mayo</option>
+                        <option value="6"  th:selected="${mes == 6}">Junio</option>
+                        <option value="7"  th:selected="${mes == 7}">Julio</option>
+                        <option value="8"  th:selected="${mes == 8}">Agosto</option>
+                        <option value="9"  th:selected="${mes == 9}">Septiembre</option>
+                        <option value="10" th:selected="${mes == 10}">Octubre</option>
+                        <option value="11" th:selected="${mes == 11}">Noviembre</option>
+                        <option value="12" th:selected="${mes == 12}">Diciembre</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Año</label>
+                    <input type="number" class="form-control" name="anio" th:value="${anio}">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn-buscar w-100">🔍 Buscar</button>
+                </div>
             </div>
         </form>
     </div>
 
-    <!-- Registros del dia -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">📅 Registros del día: <span th:text="${fecha}"></span></h6>
-        <div class="row g-3">
-            <div class="col-md-3 text-center">
-                <div class="fw-bold fs-3 text-success" th:text="${#lists.size(tiemposFecha)}">0</div>
-                <div class="text-muted small">Tiempos de Producción</div>
-            </div>
-            <div class="col-md-3 text-center">
-                <div class="fw-bold fs-3 text-warning" th:text="${#lists.size(granelFecha)}">0</div>
-                <div class="text-muted small">Producción Granel</div>
-            </div>
-            <div class="col-md-3 text-center">
-                <div class="fw-bold fs-3 text-primary" th:text="${#lists.size(ptFecha)}">0</div>
-                <div class="text-muted small">Control PT</div>
-            </div>
-            <div class="col-md-3 text-center">
-                <div class="fw-bold fs-3 text-danger" th:text="${#lists.size(conciliacionFecha)}">0</div>
-                <div class="text-muted small">Conciliación</div>
-            </div>
+    <!-- Stats del día -->
+    <div class="stats-row">
+        <div class="stat v">
+            <div class="stat-n" th:text="${#lists.size(tiemposFecha)}">0</div>
+            <div class="stat-l">Tiempos registrados</div>
+        </div>
+        <div class="stat g">
+            <div class="stat-n" th:text="${#lists.size(granelFecha)}">0</div>
+            <div class="stat-l">Producción granel</div>
+        </div>
+        <div class="stat a">
+            <div class="stat-n" th:text="${#lists.size(ptFecha)}">0</div>
+            <div class="stat-l">Control PT</div>
+        </div>
+        <div class="stat r">
+            <div class="stat-n" th:text="${#lists.size(conciliacionFecha)}">0</div>
+            <div class="stat-l">Conciliaciones</div>
         </div>
     </div>
 
-    <!-- Tiempos de produccion del dia -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">⏱️ Tiempos de Producción</h6>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Operador</th>
-                    <th>Motores Inicio</th>
-                    <th>Motores Fin</th>
-                    <th>Producción Inicio</th>
-                    <th>Producción Fin</th>
-                    <th>Observaciones</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(tiemposFecha)}">
-                    <td colspan="7" class="text-center text-muted py-3">No hay registros</td>
-                </tr>
-                <tr th:each="r : ${tiemposFecha}">
-                    <td th:text="${r.fecha}"></td>
-                    <td th:text="${r.operador}"></td>
-                    <td th:text="${r.motoresInicio}"></td>
-                    <td th:text="${r.motoresFin}"></td>
-                    <td th:text="${r.produccionInicio}"></td>
-                    <td th:text="${r.produccionFin}"></td>
-                    <td th:text="${r.observaciones}"></td>
-                </tr>
-                </tbody>
-            </table>
+    <!-- Tabla tiempos -->
+    <div class="tabla-card">
+        <div class="tabla-head">
+            <span class="tabla-head-title">⏱️ Tiempos de Producción</span>
+            <span class="tabla-head-badge" th:text="${#lists.size(tiemposFecha)} + ' registros'"></span>
         </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Operador</th>
+                <th>Motores Inicio</th>
+                <th>Motores Fin</th>
+                <th>Prod. Inicio</th>
+                <th>Prod. Fin</th>
+                <th>Observaciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(tiemposFecha)}">
+                <td colspan="7" class="sin-registros">No hay registros para esta fecha</td>
+            </tr>
+            <tr th:each="r : ${tiemposFecha}">
+                <td><span class="badge-fecha" th:text="${r.fecha}"></span></td>
+                <td th:text="${r.operador}"></td>
+                <td th:text="${r.motoresInicio}"></td>
+                <td th:text="${r.motoresFin}"></td>
+                <td th:text="${r.produccionInicio}"></td>
+                <td th:text="${r.produccionFin}"></td>
+                <td th:text="${r.observaciones}"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
-    <!-- Control PT del dia -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">🏭 Control Diario PT</h6>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Producto</th>
-                    <th>Lote</th>
-                    <th>Total Unidades</th>
-                    <th>Total Sacos</th>
-                    <th>MP (kg)</th>
-                    <th>Operadores</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(ptFecha)}">
-                    <td colspan="7" class="text-center text-muted py-3">No hay registros</td>
-                </tr>
-                <tr th:each="r : ${ptFecha}">
-                    <td th:text="${r.fecha}"></td>
-                    <td th:text="${r.producto}"></td>
-                    <td th:text="${r.lote}"></td>
-                    <td th:text="${r.totalUnidades}"></td>
-                    <td th:text="${r.totalSacos}"></td>
-                    <td th:text="${r.materiaPrimaUtilizadaKg}"></td>
-                    <td th:text="${r.operadores}"></td>
-                </tr>
-                </tbody>
-            </table>
+    <!-- Tabla control PT -->
+    <div class="tabla-card">
+        <div class="tabla-head">
+            <span class="tabla-head-title">🏭 Control Diario PT</span>
+            <span class="tabla-head-badge" th:text="${#lists.size(ptFecha)} + ' registros'"></span>
         </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Lote</th>
+                <th>Total Unidades</th>
+                <th>Total Sacos</th>
+                <th>MP (kg)</th>
+                <th>Operadores</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(ptFecha)}">
+                <td colspan="7" class="sin-registros">No hay registros para esta fecha</td>
+            </tr>
+            <tr th:each="r : ${ptFecha}">
+                <td><span class="badge-fecha" th:text="${r.fecha}"></span></td>
+                <td th:text="${r.producto}"></td>
+                <td th:text="${r.lote}"></td>
+                <td th:text="${r.totalUnidades}"></td>
+                <td th:text="${r.totalSacos}"></td>
+                <td th:text="${r.materiaPrimaUtilizadaKg}"></td>
+                <td th:text="${r.operadores}"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- Resumen mensual -->
-    <div class="card p-4 mb-5">
-        <h6 class="section-title">📊 Resumen Mensual — <span th:text="${mes}"></span>/<span th:text="${anio}"></span></h6>
-        <div class="row g-3">
-            <div class="col-md-4 text-center">
-                <div class="fw-bold fs-2 text-success" th:text="${#lists.size(tiemposMes)}">0</div>
-                <div class="text-muted">Registros de Tiempos</div>
+    <div class="resumen-card">
+        <div class="resumen-title">
+            📊 Resumen mensual —
+            <span th:text="${mes}"></span> /
+            <span th:text="${anio}"></span>
+        </div>
+        <div class="stats-row" style="margin-bottom:0;">
+            <div class="stat v">
+                <div class="stat-n" th:text="${#lists.size(tiemposMes)}">0</div>
+                <div class="stat-l">Registros tiempos</div>
             </div>
-            <div class="col-md-4 text-center">
-                <div class="fw-bold fs-2 text-warning" th:text="${#lists.size(granelMes)}">0</div>
-                <div class="text-muted">Registros Granel</div>
+            <div class="stat g">
+                <div class="stat-n" th:text="${#lists.size(granelMes)}">0</div>
+                <div class="stat-l">Registros granel</div>
             </div>
-            <div class="col-md-4 text-center">
-                <div class="fw-bold fs-2 text-primary" th:text="${#lists.size(ptMes)}">0</div>
-                <div class="text-muted">Registros Control PT</div>
+            <div class="stat a">
+                <div class="stat-n" th:text="${#lists.size(ptMes)}">0</div>
+                <div class="stat-l">Registros Control PT</div>
+            </div>
+            <div class="stat r">
+                <div class="stat-n">—</div>
+                <div class="stat-l">Mes seleccionado</div>
             </div>
         </div>
     </div>

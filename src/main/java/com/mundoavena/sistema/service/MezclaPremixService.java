@@ -23,7 +23,7 @@ public class MezclaPremixService {
     }
 
     public List<MezclaPremix> listarPorFecha(LocalDate fecha) {
-        return repository.findByFecha(fecha);
+        return repository.findByFechaInicioOrderByFechaInicioDesc(fecha);
     }
 
     public List<MezclaPremix> listarTodos() {
@@ -31,6 +31,6 @@ public class MezclaPremixService {
     }
 
     public List<MezclaPremix> listarPorRango(LocalDate inicio, LocalDate fin) {
-        return repository.findByFechaBetween(inicio, fin);
+        return repository.findByFechaInicioBetween(inicio, fin);
     }
 }

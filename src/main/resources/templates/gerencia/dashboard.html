@@ -2,90 +2,147 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Gerencia - Dashboard</title>
+    <title>Dashboard Gerencia — Mundo Avena</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { background-color: #f5f0e8; }
-        .navbar { background-color: #2d5a27; }
-        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .stat-card { border-radius: 12px; padding: 20px; color: white; }
-        .stat-card.verde { background-color: #2d5a27; }
-        .stat-card.amarillo { background-color: #d4a017; }
-        .stat-card.azul { background-color: #1a5276; }
-        .stat-card.rojo { background-color: #922b21; }
-        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
-        .table thead th { background-color: #2d5a27; color: white; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f0e8; font-family: 'Segoe UI', sans-serif; }
+
+        .navbar { background: #2d5a27; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-logo { background: white; border-radius: 6px; padding: 5px 10px; }
+        .nav-logo img { height: 26px; object-fit: contain; }
+        .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+        .nav-role { color: #b28c65; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-right { display: flex; gap: 8px; align-items: center; }
+        .nav-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); color: white; text-decoration: none; }
+        .nav-btn-gold { background: #b28c65; border-color: #b28c65; color: white; font-weight: 600; border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
+        .nav-btn-gold:hover { background: #9a7654; color: white; text-decoration: none; }
+
+        .content { padding: 28px; }
+
+        .page-header { margin-bottom: 24px; }
+        .page-badge { display: inline-block; background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 3px 12px; border-radius: 20px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .page-title { font-size: 22px; font-weight: 700; color: #1a2e1a; margin: 0 0 2px; }
+        .page-sub { font-size: 13px; color: #aaa; }
+
+        .alerta-exito { background: #f0f7ee; border-left: 4px solid #2d5a27; border-radius: 8px; padding: 12px 16px; color: #2d5a27; font-size: 13px; margin-bottom: 20px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 14px; padding: 18px 16px; border-left: 4px solid; }
+        .stat-card.verde { border-left-color: #2d5a27; }
+        .stat-card.verde .stat-label { color: #2d5a27; }
+        .stat-card.verde .stat-num { color: #2d5a27; }
+        .stat-card.dorado { border-left-color: #b28c65; }
+        .stat-card.dorado .stat-label { color: #b28c65; }
+        .stat-card.dorado .stat-num { color: #b28c65; }
+        .stat-card.azul { border-left-color: #185FA5; }
+        .stat-card.azul .stat-label { color: #185FA5; }
+        .stat-card.azul .stat-num { color: #185FA5; }
+        .stat-card.rojo { border-left-color: #A32D2D; }
+        .stat-card.rojo .stat-label { color: #A32D2D; }
+        .stat-card.rojo .stat-num { color: #A32D2D; }
+        .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .stat-num { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+        .stat-sub { font-size: 10px; color: #aaa; }
+
+        .tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        .tabla-card { background: white; border-radius: 14px; overflow: hidden; }
+        .tabla-head { background: #1a2e1a; color: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+        .tabla-head-title { font-size: 12px; font-weight: 600; }
+        .tabla-head-badge { background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+        .tabla-card table { width: 100%; border-collapse: collapse; }
+        .tabla-card thead th { background: #f5f0e8; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #2d5a27; padding: 7px 12px; letter-spacing: 0.5px; }
+        .tabla-card tbody td { font-size: 11px; color: #444; padding: 8px 12px; border-bottom: 1px solid #f5f0e8; }
+        .tabla-card tbody tr:last-child td { border-bottom: none; }
+        .tabla-card tbody tr:hover td { background: #faf9f7; }
+        .sin-registros { text-align: center; color: #ccc; padding: 20px; font-size: 12px; }
+
+        .cierre-card { background: white; border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+        .cierre-head { background: #1a2e1a; color: white; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+        .cierre-head-title { font-size: 12px; font-weight: 600; }
+        .btn-nuevo { background: #2d5a27; color: white; border: none; border-radius: 6px; padding: 5px 14px; font-size: 10px; font-weight: 600; text-decoration: none; }
+        .btn-nuevo:hover { background: #1e3d1a; color: white; text-decoration: none; }
+        .badge-confirmado { background: #f0f7ee; color: #2d5a27; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+        .badge-borrador { background: #fff8e1; color: #b28c65; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark px-4 py-3">
-    <span class="navbar-brand fw-bold">🌾 Mundo Avena - Gerencia</span>
-    <div class="d-flex gap-3 align-items-center">
-        <a href="/gerencia/historial" class="btn btn-outline-light btn-sm">📋 Historial</a>
-        <a href="/gerencia/costos" class="btn btn-warning btn-sm fw-bold">💰 Cálculo de Costos</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="nav-logo">
+            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+        </div>
+        <div class="nav-sep"></div>
+        <div class="nav-role">Gerencia</div>
+    </div>
+    <div class="nav-right">
+        <a href="/gerencia/historial" class="nav-btn">📋 Historial</a>
+        <a href="/gerencia/costos" class="nav-btn-gold">💰 Costos</a>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="nav-btn" style="cursor:pointer;">Cerrar Sesión</button>
         </form>
     </div>
 </nav>
 
-<div class="container mt-4">
-    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
+<div class="content">
 
-    <h4 class="fw-bold mb-4">📊 Dashboard de Producción</h4>
-    <p class="text-muted" th:text="'Registros del día: ' + ${hoy}"></p>
+    <div th:if="${exito}" class="alerta-exito">
+        ✅ <span th:text="${exito}"></span>
+    </div>
 
-    <!-- Tarjetas resumen -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="stat-card verde">
-                <div class="fs-6 mb-1">Tiempos Registrados</div>
-                <div class="fs-1 fw-bold" th:text="${#lists.size(tiemposHoy)}">0</div>
-                <div class="small">registros hoy</div>
-            </div>
+    <div class="page-header">
+        <div class="page-badge">Gerencia</div>
+        <div class="page-title">Dashboard de Producción</div>
+        <div class="page-sub" th:text="'Registros del día: ' + ${hoy}"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card verde">
+            <div class="stat-label">Tiempos hoy</div>
+            <div class="stat-num" th:text="${#lists.size(tiemposHoy)}">0</div>
+            <div class="stat-sub">registros del día</div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card amarillo">
-                <div class="fs-6 mb-1">Producciones Granel</div>
-                <div class="fs-1 fw-bold" th:text="${#lists.size(granelHoy)}">0</div>
-                <div class="small">registros hoy</div>
-            </div>
+        <div class="stat-card dorado">
+            <div class="stat-label">Granel hoy</div>
+            <div class="stat-num" th:text="${#lists.size(granelHoy)}">0</div>
+            <div class="stat-sub">registros del día</div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card azul">
-                <div class="fs-6 mb-1">Conciliaciones</div>
-                <div class="fs-1 fw-bold" th:text="${#lists.size(conciliacionHoy)}">0</div>
-                <div class="small">registros hoy</div>
-            </div>
+        <div class="stat-card azul">
+            <div class="stat-label">Conciliaciones</div>
+            <div class="stat-num" th:text="${#lists.size(conciliacionHoy)}">0</div>
+            <div class="stat-sub">registros del día</div>
         </div>
-        <div class="col-md-3">
-            <div class="stat-card rojo">
-                <div class="fs-6 mb-1">Control PT</div>
-                <div class="fs-1 fw-bold" th:text="${#lists.size(ptHoy)}">0</div>
-                <div class="small">registros hoy</div>
-            </div>
+        <div class="stat-card rojo">
+            <div class="stat-label">Control PT</div>
+            <div class="stat-num" th:text="${#lists.size(ptHoy)}">0</div>
+            <div class="stat-sub">registros del día</div>
         </div>
     </div>
 
-    <!-- Tiempos hoy -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">⏱️ Tiempos de Producción - Hoy</h6>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
+    <!-- Tablas lado a lado -->
+    <div class="tables-row">
+        <div class="tabla-card">
+            <div class="tabla-head">
+                <span class="tabla-head-title">⏱️ Tiempos de Producción — Hoy</span>
+                <span class="tabla-head-badge" th:text="${#lists.size(tiemposHoy)} + ' registros'"></span>
+            </div>
+            <table>
                 <thead>
                 <tr>
                     <th>Operador</th>
-                    <th>Motores Inicio</th>
-                    <th>Motores Fin</th>
-                    <th>Producción Inicio</th>
-                    <th>Producción Fin</th>
-                    <th>Observaciones</th>
+                    <th>M. Inicio</th>
+                    <th>M. Fin</th>
+                    <th>P. Inicio</th>
+                    <th>P. Fin</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${#lists.isEmpty(tiemposHoy)}">
-                    <td colspan="6" class="text-center text-muted py-3">No hay registros hoy</td>
+                    <td colspan="5" class="sin-registros">No hay registros hoy</td>
                 </tr>
                 <tr th:each="r : ${tiemposHoy}">
                     <td th:text="${r.operador}"></td>
@@ -93,35 +150,32 @@
                     <td th:text="${r.motoresFin}"></td>
                     <td th:text="${r.produccionInicio}"></td>
                     <td th:text="${r.produccionFin}"></td>
-                    <td th:text="${r.observaciones}"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- Control PT hoy -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">🏭 Control Diario PT - Hoy</h6>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
+        <div class="tabla-card">
+            <div class="tabla-head">
+                <span class="tabla-head-title">🏭 Control Diario PT — Hoy</span>
+                <span class="tabla-head-badge" th:text="${#lists.size(ptHoy)} + ' registros'"></span>
+            </div>
+            <table>
                 <thead>
                 <tr>
                     <th>Producto</th>
-                    <th>Lote</th>
-                    <th>Total Unidades</th>
-                    <th>Total Sacos</th>
-                    <th>MP Utilizada (kg)</th>
+                    <th>Unidades</th>
+                    <th>Sacos</th>
+                    <th>MP (kg)</th>
                     <th>Operadores</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${#lists.isEmpty(ptHoy)}">
-                    <td colspan="6" class="text-center text-muted py-3">No hay registros hoy</td>
+                    <td colspan="5" class="sin-registros">No hay registros hoy</td>
                 </tr>
                 <tr th:each="r : ${ptHoy}">
                     <td th:text="${r.producto}"></td>
-                    <td th:text="${r.lote}"></td>
                     <td th:text="${r.totalUnidades}"></td>
                     <td th:text="${r.totalSacos}"></td>
                     <td th:text="${r.materiaPrimaUtilizadaKg}"></td>
@@ -133,44 +187,42 @@
     </div>
 
     <!-- Cierres mensuales -->
-    <div class="card p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="section-title mb-0">💰 Cierres Mensuales</h6>
-            <a href="/gerencia/costos" class="btn btn-success btn-sm">+ Nuevo Cálculo</a>
+    <div class="cierre-card">
+        <div class="cierre-head">
+            <span class="cierre-head-title">💰 Cierres Mensuales</span>
+            <a href="/gerencia/costos" class="btn-nuevo">+ Nuevo Cálculo</a>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                <tr>
-                    <th>Mes</th>
-                    <th>Año</th>
-                    <th>Estado</th>
-                    <th>Calculado por</th>
-                    <th>Fecha Cálculo</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(cierres)}">
-                    <td colspan="6" class="text-center text-muted py-3">No hay cierres registrados</td>
-                </tr>
-                <tr th:each="c : ${cierres}">
-                    <td th:text="${c.mes}"></td>
-                    <td th:text="${c.anio}"></td>
-                    <td>
-                        <span th:if="${c.estado.name() == 'CONFIRMADO'}" class="badge bg-success">Confirmado</span>
-                        <span th:if="${c.estado.name() == 'BORRADOR'}" class="badge bg-warning text-dark">Borrador</span>
-                    </td>
-                    <td th:text="${c.calculadoPor?.nombreCompleto}"></td>
-                    <td th:text="${#temporals.format(c.fechaCalculo, 'dd/MM/yyyy HH:mm')}"></td>
-                    <td>
-                        <a th:href="@{/gerencia/costos/ver/{id}(id=${c.id})}"
-                           class="btn btn-sm btn-outline-primary">Ver</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+            <tr>
+                <th style="background:#f5f0e8; font-size:9px; font-weight:700; text-transform:uppercase; color:#2d5a27; padding:7px 12px; letter-spacing:0.5px;">Mes</th>
+                <th style="background:#f5f0e8; font-size:9px; font-weight:700; text-transform:uppercase; color:#2d5a27; padding:7px 12px;">Año</th>
+                <th style="background:#f5f0e8; font-size:9px; font-weight:700; text-transform:uppercase; color:#2d5a27; padding:7px 12px;">Estado</th>
+                <th style="background:#f5f0e8; font-size:9px; font-weight:700; text-transform:uppercase; color:#2d5a27; padding:7px 12px;">Calculado por</th>
+                <th style="background:#f5f0e8; font-size:9px; font-weight:700; text-transform:uppercase; color:#2d5a27; padding:7px 12px;">Fecha</th>
+                <th style="background:#f5f0e8; font-size:9px; font-weight:700; text-transform:uppercase; color:#2d5a27; padding:7px 12px;">Acción</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(cierres)}">
+                <td colspan="6" class="sin-registros">No hay cierres registrados</td>
+            </tr>
+            <tr th:each="c : ${cierres}" style="border-bottom:1px solid #f5f0e8;">
+                <td style="font-size:12px; padding:8px 12px; color:#444;" th:text="${c.mes}"></td>
+                <td style="font-size:12px; padding:8px 12px; color:#444;" th:text="${c.anio}"></td>
+                <td style="padding:8px 12px;">
+                    <span th:if="${c.estado.name() == 'CONFIRMADO'}" class="badge-confirmado">Confirmado</span>
+                    <span th:if="${c.estado.name() == 'BORRADOR'}" class="badge-borrador">Borrador</span>
+                </td>
+                <td style="font-size:12px; padding:8px 12px; color:#444;" th:text="${c.calculadoPor?.nombreCompleto}"></td>
+                <td style="font-size:12px; padding:8px 12px; color:#444;" th:text="${#temporals.format(c.fechaCalculo, 'dd/MM/yyyy HH:mm')}"></td>
+                <td style="padding:8px 12px;">
+                    <a th:href="@{/gerencia/costos/ver/{id}(id=${c.id})}"
+                       style="color:#185FA5; font-size:11px; font-weight:600; text-decoration:none;">Ver →</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 </body>

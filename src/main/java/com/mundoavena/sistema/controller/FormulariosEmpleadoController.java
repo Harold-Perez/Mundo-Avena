@@ -122,7 +122,7 @@ public class FormulariosEmpleadoController {
         premix.setUsuario(usuario);
         MezclaPremix guardado = mezclaPremixService.guardar(premix);
         auditoriaService.registrar(usuario, "CREAR", "MEZCLA_PREMIX",
-                guardado.getId(), "Mezcla premix: " + premix.getFecha(),
+                guardado.getId(), "Mezcla premix: " + premix.getFechaInicio(),
                 request.getRemoteAddr());
         ra.addFlashAttribute("exito", "Mezcla Premix guardada correctamente");
         return "redirect:/empleado/dashboard";

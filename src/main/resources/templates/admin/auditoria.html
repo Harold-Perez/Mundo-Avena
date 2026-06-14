@@ -2,100 +2,138 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Auditoría - Mundo Avena</title>
+    <title>Auditoría — Mundo Avena</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f5f0e8; }
-        .navbar { background-color: #2d5a27; }
-        .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .section-title { color: #2d5a27; font-weight: 700; border-bottom: 2px solid #2d5a27; padding-bottom: 8px; margin-bottom: 20px; }
-        .table thead th { background-color: #2d5a27; color: white; }
-        .btn-filtrar { background-color: #2d5a27; color: white; border: none; padding: 8px 24px; border-radius: 8px; font-weight: 600; }
-        .btn-filtrar:hover { background-color: #1e3d1a; color: white; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f5f0e8; font-family: 'Segoe UI', sans-serif; }
+
+        .navbar { background: #1a2e1a; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(178,140,101,0.3); }
+        .nav-left { display: flex; align-items: center; gap: 12px; }
+        .nav-logo { background: white; border-radius: 6px; padding: 5px 10px; }
+        .nav-logo img { height: 26px; object-fit: contain; }
+        .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.15); }
+        .nav-role { color: #b28c65; font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+        .nav-right { display: flex; gap: 8px; align-items: center; }
+        .nav-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.75); border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
+        .nav-btn:hover { background: rgba(255,255,255,0.15); color: white; text-decoration: none; }
+        .nav-btn-gold { background: #b28c65; border-color: #b28c65; color: white; font-weight: 600; border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
+        .nav-btn-gold:hover { background: #9a7654; color: white; text-decoration: none; }
+
+        .content { padding: 28px; }
+        .page-badge { display: inline-block; background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 3px 12px; border-radius: 20px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .page-title { font-size: 22px; font-weight: 700; color: #1a2e1a; margin: 0 0 2px; }
+        .page-sub { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+
+        .filtro-card { background: white; border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+        .filtro-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #b28c65; margin-bottom: 14px; }
+        .form-select { border: 1.5px solid #e0d8ce; border-radius: 8px; padding: 8px 12px; font-size: 12px; background: #faf9f7; color: #444; }
+        .form-select:focus { border-color: #2d5a27; outline: none; box-shadow: 0 0 0 3px rgba(45,90,39,0.1); }
+        .btn-filtrar { background: #2d5a27; color: white; border: none; border-radius: 8px; padding: 8px 20px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .btn-filtrar:hover { background: #1e3d1a; }
+        .btn-limpiar { background: white; color: #666; border: 1.5px solid #e0d8ce; border-radius: 8px; padding: 8px 20px; font-size: 12px; text-decoration: none; }
+        .btn-limpiar:hover { background: #f5f0e8; color: #444; text-decoration: none; }
+
+        .tabla-card { background: white; border-radius: 14px; overflow: hidden; }
+        .tabla-head { background: #1a2e1a; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+        .tabla-head-title { color: white; font-size: 12px; font-weight: 600; }
+        .tabla-head-badge { background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead th { background: #f5f0e8; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #2d5a27; padding: 8px 14px; letter-spacing: 0.5px; }
+        tbody td { font-size: 11px; color: #444; padding: 9px 14px; border-bottom: 1px solid #f5f0e8; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: #faf9f7; }
+        .sin-registros { text-align: center; color: #ccc; padding: 24px; font-size: 12px; }
+
+        .br { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+        .br-crear { background: #f0f7ee; color: #2d5a27; }
+        .br-editar { background: #fff8e1; color: #b28c65; }
+        .br-eliminar { background: #fef2f2; color: #A32D2D; }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark px-4 py-3">
-    <span class="navbar-brand fw-bold">🌾 Mundo Avena — Admin</span>
-    <div class="d-flex gap-3 align-items-center">
-        <a href="/admin/dashboard" class="btn btn-outline-light btn-sm">← Dashboard</a>
-        <a href="/admin/usuarios" class="btn btn-outline-light btn-sm">👥 Usuarios</a>
-        <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <div class="nav-logo">
+            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+        </div>
+        <div class="nav-sep"></div>
+        <div class="nav-role">Administrador</div>
+    </div>
+    <div class="nav-right">
+        <a href="/admin/dashboard" class="nav-btn">← Dashboard</a>
+        <a href="/admin/usuarios" class="nav-btn-gold">👥 Usuarios</a>
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="nav-btn" style="cursor:pointer;">Cerrar Sesión</button>
         </form>
     </div>
 </nav>
 
-<div class="container mt-4">
-    <h4 class="fw-bold mb-4">🔍 Auditoría de Registros</h4>
+<div class="content">
+    <div class="page-badge">Administrador</div>
+    <div class="page-title">🔍 Auditoría de Registros</div>
+    <div class="page-sub">Historial completo de acciones en el sistema</div>
 
-    <!-- Filtro -->
-    <div class="card p-4 mb-4">
-        <h6 class="section-title">Filtrar por tipo de formulario</h6>
-        <form th:action="@{/admin/auditoria}" method="get" class="row g-3">
-            <div class="col-md-4">
+    <div class="filtro-card">
+        <div class="filtro-title">Filtrar por tipo de formulario</div>
+        <form th:action="@{/admin/auditoria}" method="get" class="d-flex gap-3 align-items-end">
+            <div style="flex:1;">
                 <select class="form-select" name="tipo">
                     <option value="">Todos los formularios</option>
-                    <option value="TIEMPOS_PRODUCCION"          th:selected="${tipoFiltro == 'TIEMPOS_PRODUCCION'}">Tiempos de Producción</option>
-                    <option value="PRODUCCION_GRANEL"           th:selected="${tipoFiltro == 'PRODUCCION_GRANEL'}">Producción Granel</option>
-                    <option value="CONCILIACION_MATERIALES"     th:selected="${tipoFiltro == 'CONCILIACION_MATERIALES'}">Conciliación</option>
-                    <option value="MEZCLA_PREMIX"               th:selected="${tipoFiltro == 'MEZCLA_PREMIX'}">Mezcla Premix</option>
-                    <option value="CONTROL_DIARIO_PT"           th:selected="${tipoFiltro == 'CONTROL_DIARIO_PT'}">Control Diario PT</option>
-                    <option value="CONTROL_PESOS_GRANEL"        th:selected="${tipoFiltro == 'CONTROL_PESOS_GRANEL'}">Control de Pesos</option>
-                    <option value="MONITOREO_PCC2"              th:selected="${tipoFiltro == 'MONITOREO_PCC2'}">Monitoreo PCC2</option>
+                    <option value="TIEMPOS_PRODUCCION"      th:selected="${tipoFiltro == 'TIEMPOS_PRODUCCION'}">Tiempos de Producción</option>
+                    <option value="PRODUCCION_GRANEL"       th:selected="${tipoFiltro == 'PRODUCCION_GRANEL'}">Producción Granel</option>
+                    <option value="CONCILIACION_MATERIALES" th:selected="${tipoFiltro == 'CONCILIACION_MATERIALES'}">Conciliación</option>
+                    <option value="MEZCLA_PREMIX"           th:selected="${tipoFiltro == 'MEZCLA_PREMIX'}">Mezcla Premix</option>
+                    <option value="CONTROL_DIARIO_PT"       th:selected="${tipoFiltro == 'CONTROL_DIARIO_PT'}">Control Diario PT</option>
+                    <option value="CONTROL_PESOS_GRANEL"    th:selected="${tipoFiltro == 'CONTROL_PESOS_GRANEL'}">Control de Pesos</option>
+                    <option value="MONITOREO_PCC2"          th:selected="${tipoFiltro == 'MONITOREO_PCC2'}">Monitoreo PCC2</option>
                 </select>
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-filtrar w-100">🔍 Filtrar</button>
-            </div>
-            <div class="col-md-2">
-                <a href="/admin/auditoria" class="btn btn-outline-secondary w-100">Limpiar</a>
-            </div>
+            <button type="submit" class="btn-filtrar">🔍 Filtrar</button>
+            <a href="/admin/auditoria" class="btn-limpiar">Limpiar</a>
         </form>
     </div>
 
-    <!-- Tabla -->
-    <div class="card p-4 mb-5">
-        <h6 class="section-title">
-            Registros
-            <span th:if="${tipoFiltro != ''}" th:text="'— ' + ${tipoFiltro}"></span>
-            <span class="badge bg-secondary ms-2" th:text="${#lists.size(registros)}">0</span>
-        </h6>
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead>
-                <tr>
-                    <th>Fecha y Hora</th>
-                    <th>Usuario</th>
-                    <th>Nombre</th>
-                    <th>Acción</th>
-                    <th>Formulario</th>
-                    <th>Detalle</th>
-                    <th>IP</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(registros)}">
-                    <td colspan="7" class="text-center text-muted py-3">No hay registros de auditoría</td>
-                </tr>
-                <tr th:each="r : ${registros}">
-                    <td th:text="${#temporals.format(r.fechaHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
-                    <td th:text="${r.usuario.username}"></td>
-                    <td th:text="${r.usuario.nombreCompleto}"></td>
-                    <td>
-                        <span class="badge bg-success" th:if="${r.accion == 'CREAR'}">CREAR</span>
-                        <span class="badge bg-warning text-dark" th:if="${r.accion == 'EDITAR'}">EDITAR</span>
-                        <span class="badge bg-danger" th:if="${r.accion == 'ELIMINAR'}">ELIMINAR</span>
-                    </td>
-                    <td>
-                        <span class="badge bg-secondary" th:text="${r.tipoFormulario}"></span>
-                    </td>
-                    <td th:text="${r.detalle}"></td>
-                    <td class="text-muted small" th:text="${r.ipAddress}"></td>
-                </tr>
-                </tbody>
-            </table>
+    <div class="tabla-card">
+        <div class="tabla-head">
+            <span class="tabla-head-title">Registros de Auditoría</span>
+            <span class="tabla-head-badge" th:text="${#lists.size(registros)} + ' registros'"></span>
         </div>
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha y Hora</th>
+                <th>Usuario</th>
+                <th>Nombre</th>
+                <th>Acción</th>
+                <th>Formulario</th>
+                <th>Detalle</th>
+                <th>IP</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(registros)}">
+                <td colspan="7" class="sin-registros">No hay registros de auditoría</td>
+            </tr>
+            <tr th:each="r : ${registros}">
+                <td th:text="${#temporals.format(r.fechaHora, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                <td th:text="${r.usuario.username}"></td>
+                <td th:text="${r.usuario.nombreCompleto}"></td>
+                <td>
+                    <span th:if="${r.accion == 'CREAR'}" class="br br-crear">CREAR</span>
+                    <span th:if="${r.accion == 'EDITAR'}" class="br br-editar">EDITAR</span>
+                    <span th:if="${r.accion == 'ELIMINAR'}" class="br br-eliminar">ELIMINAR</span>
+                </td>
+                <td>
+                    <span class="br" style="background:#f0f0f0; color:#555;" th:text="${r.tipoFormulario}"></span>
+                </td>
+                <td th:text="${r.detalle}"></td>
+                <td style="color:#aaa; font-size:10px;" th:text="${r.ipAddress}"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 </body>

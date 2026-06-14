@@ -15,6 +15,7 @@
         .list-group-item-action { cursor: pointer; }
         .list-group-item-action:hover { background-color: #f0f7ee; }
     </style>
+    <script src="/js/validaciones.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-dark px-4 py-3">
@@ -55,23 +56,33 @@
                     <label class="form-label fw-semibold">Hora Fin</label>
                     <input type="time" class="form-control" name="horaFin">
                 </div>
-                <div class="col-md-6 position-relative">
+
+                <!-- Operadores multiselect -->
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Operadores</label>
-                    <input type="text" class="form-control" name="operadores"
-                           id="operadorInput"
-                           placeholder="Escribe para buscar operador..."
-                           autocomplete="off">
-                    <div id="operadorSuggestions" class="list-group position-absolute w-100"
-                         style="z-index:1000; display:none;"></div>
+                    <div class="border rounded p-2 mb-1" id="operadoresSeleccionados"
+                         style="min-height:38px; background:white; display:flex; flex-wrap:wrap; gap:4px;"></div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="operadorSearch"
+                               placeholder="Escribe para agregar operador..." autocomplete="off">
+                        <div id="operadorSuggestions" class="list-group position-absolute w-100"
+                             style="z-index:1000; display:none;"></div>
+                    </div>
+                    <input type="hidden" name="operadores" id="operadoresHidden">
                 </div>
-                <div class="col-md-6 position-relative">
+
+                <!-- Envasadores multiselect -->
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Envasadores</label>
-                    <input type="text" class="form-control" name="envasadores"
-                           id="envasadoresInput"
-                           placeholder="Escribe para buscar envasador..."
-                           autocomplete="off">
-                    <div id="envasadoresSuggestions" class="list-group position-absolute w-100"
-                         style="z-index:1000; display:none;"></div>
+                    <div class="border rounded p-2 mb-1" id="envasadoresSeleccionados"
+                         style="min-height:38px; background:white; display:flex; flex-wrap:wrap; gap:4px;"></div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="envasadorSearch"
+                               placeholder="Escribe para agregar envasador..." autocomplete="off">
+                        <div id="envasadoresSuggestions" class="list-group position-absolute w-100"
+                             style="z-index:1000; display:none;"></div>
+                    </div>
+                    <input type="hidden" name="envasadores" id="envasadoresHidden">
                 </div>
             </div>
         </div>
@@ -124,14 +135,12 @@
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Total Sacos Fabricados</label>
                     <input type="number" class="form-control" name="totalSacos"
-                           id="totalSacos" placeholder="0" min="0"
-                           oninput="calcUnidades()">
+                           id="totalSacos" placeholder="0" min="0" oninput="calcUnidades()">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Unidades por Saco</label>
                     <input type="number" class="form-control" name="unidadesPorSaco"
-                           id="unidadesPorSaco" placeholder="Ej: 40" min="0"
-                           oninput="calcUnidades()">
+                           id="unidadesPorSaco" placeholder="Ej: 40" min="0" oninput="calcUnidades()">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Total Unidades Envasadas</label>
@@ -140,18 +149,15 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Total Fardos Fabricados</label>
-                    <input type="number" class="form-control" name="totalFardos"
-                           placeholder="0" min="0">
+                    <input type="number" class="form-control" name="totalFardos" placeholder="0" min="0">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Total Producto Empacado (kg)</label>
-                    <input type="number" step="0.01" class="form-control" name="totalProductoEmpacadoKg"
-                           placeholder="0.00">
+                    <input type="number" step="0.01" class="form-control" name="totalProductoEmpacadoKg" placeholder="0.00">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Materia Prima Utilizada (kg)</label>
-                    <input type="number" step="0.01" class="form-control" name="materiaPrimaUtilizadaKg"
-                           placeholder="0.00">
+                    <input type="number" step="0.01" class="form-control" name="materiaPrimaUtilizadaKg" placeholder="0.00">
                 </div>
             </div>
         </div>
@@ -176,11 +182,35 @@
         document.getElementById('totalUnidades').value = sacos * unidades;
     }
 
-    function initAutocomplete(inputId, suggestionsId) {
-        const input = document.getElementById(inputId);
+    function initMultiSelect(searchId, suggestionsId, selectedDivId, hiddenId) {
+        const search = document.getElementById(searchId);
         const suggestions = document.getElementById(suggestionsId);
-        if (!input) return;
-        input.addEventListener('input', function() {
+        const selectedDiv = document.getElementById(selectedDivId);
+        const hidden = document.getElementById(hiddenId);
+        let selected = [];
+
+        function updateHidden() {
+            hidden.value = selected.join(', ');
+        }
+
+        function addTag(nombre) {
+            if (selected.includes(nombre)) return;
+            selected.push(nombre);
+            const tag = document.createElement('span');
+            tag.style.cssText = 'background:#2d5a27; color:white; padding:4px 8px; border-radius:6px; font-size:12px; display:flex; align-items:center; gap:4px;';
+            tag.innerHTML = `${nombre} <button type="button" style="background:none;border:none;color:white;padding:0;font-size:14px;line-height:1;cursor:pointer;">×</button>`;
+            tag.querySelector('button').onclick = () => {
+                tag.remove();
+                selected = selected.filter(v => v !== nombre);
+                updateHidden();
+            };
+            selectedDiv.appendChild(tag);
+            updateHidden();
+            search.value = '';
+            suggestions.style.display = 'none';
+        }
+
+        search.addEventListener('input', function() {
             const val = this.value.trim();
             suggestions.innerHTML = '';
             if (val.length < 1) { suggestions.style.display = 'none'; return; }
@@ -193,20 +223,21 @@
                         item.type = 'button';
                         item.className = 'list-group-item list-group-item-action';
                         item.textContent = nombre;
-                        item.onclick = () => { input.value = nombre; suggestions.style.display = 'none'; };
+                        item.onclick = () => addTag(nombre);
                         suggestions.appendChild(item);
                     });
                     suggestions.style.display = 'block';
                 });
         });
+
         document.addEventListener('click', function(e) {
-            if (!input.contains(e.target) && !suggestions.contains(e.target))
+            if (!search.contains(e.target) && !suggestions.contains(e.target))
                 suggestions.style.display = 'none';
         });
     }
 
-    initAutocomplete('operadorInput', 'operadorSuggestions');
-    initAutocomplete('envasadoresInput', 'envasadoresSuggestions');
+    initMultiSelect('operadorSearch', 'operadorSuggestions', 'operadoresSeleccionados', 'operadoresHidden');
+    initMultiSelect('envasadorSearch', 'envasadoresSuggestions', 'envasadoresSeleccionados', 'envasadoresHidden');
 </script>
 </body>
 </html>

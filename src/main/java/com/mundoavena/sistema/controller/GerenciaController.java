@@ -50,18 +50,17 @@ public class GerenciaController {
         if (mes == null) mes = hoy.getMonthValue();
         if (anio == null) anio = hoy.getYear();
 
-        // Registros por fecha
         model.addAttribute("tiemposFecha", tiemposService.listarPorFecha(fecha));
         model.addAttribute("granelFecha", granelService.listarPorFecha(fecha));
         model.addAttribute("ptFecha", controlPTService.listarPorFecha(fecha));
         model.addAttribute("conciliacionFecha", conciliacionService.listarPorFecha(fecha));
 
-        // Registros por mes
         LocalDate inicioMes = LocalDate.of(anio, mes, 1);
         LocalDate finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
         model.addAttribute("tiemposMes", tiemposService.listarPorRango(inicioMes, finMes));
         model.addAttribute("granelMes", granelService.listarPorRango(inicioMes, finMes));
         model.addAttribute("ptMes", controlPTService.listarPorRango(inicioMes, finMes));
+        model.addAttribute("conciliacionMes", conciliacionService.listarPorRango(inicioMes, finMes));
 
         model.addAttribute("fecha", fecha);
         model.addAttribute("mes", mes);
@@ -137,8 +136,15 @@ public class GerenciaController {
         CierreMensual cierre = cierreService.listarTodos().stream()
                 .filter(c -> c.getId().equals(id))
                 .findFirst().orElseThrow();
+        List<DetalleCostoPorProducto> detalles = cierreService.obtenerDetalles(cierre);
+
+        double totalCostoMes = detalles.stream()
+                .mapToDouble(d -> d.getCostoTotalQ())
+                .sum();
+
         model.addAttribute("cierre", cierre);
-        model.addAttribute("detalles", cierreService.obtenerDetalles(cierre));
+        model.addAttribute("detalles", detalles);
+        model.addAttribute("totalCostoMes", String.format("Q%,.0f", totalCostoMes));
         return "gerencia/ver-cierre";
     }
 

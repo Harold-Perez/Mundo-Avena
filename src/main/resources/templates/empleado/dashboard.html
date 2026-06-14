@@ -2,142 +2,418 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Empleado - Dashboard</title>
+    <title>Dashboard Empleado — Mundo Avena</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { background-color: #f5f0e8; }
-        .navbar { background-color: #2d5a27; }
-        .card-formulario {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
-            cursor: pointer;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f0e8; display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: #2d5a27;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 100;
         }
-        .card-formulario:hover { transform: translateY(-4px); }
-        .icon-circle {
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            display: flex; align-items: center;
-            justify-content: center;
-            font-size: 24px;
+        .sidebar-logo-box {
+            padding: 20px 16px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 12px;
+        }
+        .sidebar-logo {
+            background: white;
+            border-radius: 8px;
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+        .sidebar-logo img { height: 28px; object-fit: contain; }
+        .sidebar-sistema {
+            color: #b28c65;
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .sidebar-menu-label {
+            color: rgba(255,255,255,0.35);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 0 16px;
+            margin-bottom: 4px;
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .sidebar-item:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            border-left-color: #b28c65;
+            text-decoration: none;
+        }
+        .sidebar-item.active {
+            background: rgba(255,255,255,0.12);
+            color: white;
+            border-left-color: #b28c65;
+        }
+        .sidebar-item-icon { font-size: 15px; }
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-user {
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+        .sidebar-logout {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 6px;
+            padding: 7px 12px;
+            font-size: 11px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sidebar-logout:hover { background: rgba(255,255,255,0.2); }
+
+        /* MAIN */
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 28px;
+        }
+
+        /* HEADER */
+        .page-header { margin-bottom: 24px; }
+        .page-badge {
+            display: inline-block;
+            background: #b28c65;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 20px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1a2e1a;
+            margin-bottom: 2px;
+        }
+        .page-sub { font-size: 13px; color: #aaa; }
+
+        /* ALERTA */
+        .alerta-exito {
+            background: #f0f7ee;
+            border-left: 4px solid #2d5a27;
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #2d5a27;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        /* TARJETAS */
+        .formularios-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .form-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .form-card:hover {
+            border-color: #2d5a27;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(45,90,39,0.12);
+            text-decoration: none;
+        }
+        .form-card-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .form-card-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1a2e1a;
+            margin-bottom: 2px;
+        }
+        .form-card-sub { font-size: 10px; color: #aaa; }
+
+        /* SECCION */
+        .seccion-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .seccion-line { flex: 1; height: 1px; background: #e0d8ce; }
+        .seccion-titulo {
+            font-size: 11px;
+            font-weight: 700;
+            color: #b28c65;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* TABLA */
+        .tabla-wrap {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .tabla-wrap table { width: 100%; border-collapse: collapse; }
+        .tabla-wrap thead th {
+            background: #1a2e1a;
+            color: rgba(255,255,255,0.7);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+        }
+        .tabla-wrap tbody td {
+            font-size: 12px;
+            color: #444;
+            padding: 9px 14px;
+            border-bottom: 1px solid #f5f0e8;
+        }
+        .tabla-wrap tbody tr:last-child td { border-bottom: none; }
+        .tabla-wrap tbody tr:hover td { background: #faf9f7; }
+        .badge-fecha {
+            background: #f0f7ee;
+            color: #2d5a27;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+        .sin-registros {
+            text-align: center;
+            color: #ccc;
+            padding: 20px;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-dark px-4 py-3">
-    <span class="navbar-brand fw-bold">🌾 Mundo Avena</span>
-    <div class="d-flex align-items-center gap-3">
-        <span class="text-white" th:text="${usuario.nombreCompleto}"></span>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-logo-box">
+        <div class="sidebar-logo">
+            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+        </div>
+        <div class="sidebar-sistema">Control de Insumos</div>
+    </div>
+
+    <div class="sidebar-menu-label">Formularios</div>
+    <a href="/empleado/tiempos" class="sidebar-item">
+        <span class="sidebar-item-icon">⏱️</span> Tiempos de Producción
+    </a>
+    <a href="/empleado/pesos" class="sidebar-item">
+        <span class="sidebar-item-icon">⚖️</span> Control de Pesos
+    </a>
+    <a href="/empleado/granel" class="sidebar-item">
+        <span class="sidebar-item-icon">📦</span> Producción Granel
+    </a>
+    <a href="/empleado/premix" class="sidebar-item">
+        <span class="sidebar-item-icon">🧪</span> Mezcla Premix
+    </a>
+    <a href="/empleado/conciliacion" class="sidebar-item">
+        <span class="sidebar-item-icon">📊</span> Conciliación
+    </a>
+    <a href="/empleado/control-pt" class="sidebar-item">
+        <span class="sidebar-item-icon">🏭</span> Control Diario PT
+    </a>
+    <a href="/empleado/monitoreo" class="sidebar-item">
+        <span class="sidebar-item-icon">🔍</span> Monitoreo PCC2
+    </a>
+
+    <div class="sidebar-bottom">
+        <div class="sidebar-user">
+            👤 <span th:text="${usuario.nombreCompleto}">Empleado</span>
+        </div>
         <form th:action="@{/logout}" method="post">
-            <button type="submit" class="btn btn-outline-light btn-sm">Cerrar Sesión</button>
+            <button type="submit" class="sidebar-logout">Cerrar Sesión</button>
         </form>
     </div>
-</nav>
+</div>
 
-<div class="container mt-4">
-    <div th:if="${exito}" class="alert alert-success" th:text="${exito}"></div>
+<!-- MAIN -->
+<div class="main-content">
 
-    <h4 class="fw-bold mb-4">📋 Mis Formularios</h4>
-
-    <div class="row g-3">
-        <div class="col-md-4">
-            <a href="/empleado/tiempos" class="text-decoration-none">
-                <div class="card card-formulario p-4 text-center">
-                    <div class="icon-circle bg-success bg-opacity-10 mx-auto">⏱️</div>
-                    <h6 class="fw-bold text-dark">Tiempos de Producción</h6>
-                    <p class="text-muted small mb-0">Registro de horas de motores y producción</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="/empleado/pesos" class="text-decoration-none">
-                <div class="card card-formulario p-4 text-center">
-                    <div class="icon-circle bg-warning bg-opacity-10 mx-auto">⚖️</div>
-                    <h6 class="fw-bold text-dark">Control de Pesos</h6>
-                    <p class="text-muted small mb-0">Control de pesos de producto a granel</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="/empleado/granel" class="text-decoration-none">
-                <div class="card card-formulario p-4 text-center">
-                    <div class="icon-circle bg-primary bg-opacity-10 mx-auto">📦</div>
-                    <h6 class="fw-bold text-dark">Producción Granel</h6>
-                    <p class="text-muted small mb-0">Registro de producción diaria a granel</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="/empleado/premix" class="text-decoration-none">
-                <div class="card card-formulario p-4 text-center">
-                    <div class="icon-circle bg-danger bg-opacity-10 mx-auto">🧪</div>
-                    <h6 class="fw-bold text-dark">Mezcla Premix</h6>
-                    <p class="text-muted small mb-0">Preparación de mezcla premix por carga</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="/empleado/conciliacion" class="text-decoration-none">
-                <div class="card card-formulario p-4 text-center">
-                    <div class="icon-circle bg-info bg-opacity-10 mx-auto">📊</div>
-                    <h6 class="fw-bold text-dark">Conciliación</h6>
-                    <p class="text-muted small mb-0">Conciliación de materiales por turno</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="/empleado/control-pt" class="text-decoration-none">
-                <div class="card card-formulario p-4 text-center">
-                    <div class="icon-circle bg-secondary bg-opacity-10 mx-auto">🏭</div>
-                    <h6 class="fw-bold text-dark">Control Diario PT</h6>
-                    <p class="text-muted small mb-0">Control diario de producto terminado</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="/empleado/monitoreo" class="text-decoration-none">
-                <div class="card card-formulario p-4 text-center">
-                    <div class="icon-circle bg-dark bg-opacity-10 mx-auto">🔍</div>
-                    <h6 class="fw-bold text-dark">Monitoreo PCC2</h6>
-                    <p class="text-muted small mb-0">Monitoreo y verificación de empaque</p>
-                </div>
-            </a>
-        </div>
+    <!-- Header -->
+    <div class="page-header">
+        <div class="page-badge">Empleado</div>
+        <div class="page-title">Mis Formularios</div>
+        <div class="page-sub" th:text="'Selecciona el formulario que deseas registrar hoy'"></div>
     </div>
 
-    <h5 class="fw-bold mt-5 mb-3">🕐 Mis Últimos Registros</h5>
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-dark">
-                <tr>
-                    <th>Fecha</th>
-                    <th>Operador</th>
-                    <th>Motores Inicio</th>
-                    <th>Motores Fin</th>
-                    <th>Producción Inicio</th>
-                    <th>Producción Fin</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(registros)}">
-                    <td colspan="6" class="text-center text-muted py-3">No hay registros aún</td>
-                </tr>
-                <tr th:each="r : ${registros}">
-                    <td th:text="${r.fecha}"></td>
-                    <td th:text="${r.operador}"></td>
-                    <td th:text="${r.motoresInicio}"></td>
-                    <td th:text="${r.motoresFin}"></td>
-                    <td th:text="${r.produccionInicio}"></td>
-                    <td th:text="${r.produccionFin}"></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+    <!-- Alerta éxito -->
+    <div th:if="${exito}" class="alerta-exito">
+        ✅ <span th:text="${exito}"></span>
     </div>
+
+    <!-- Tarjetas formularios -->
+    <div class="formularios-grid">
+        <a href="/empleado/tiempos" class="form-card">
+            <div class="form-card-icon" style="background:#e8f5e9;">⏱️</div>
+            <div>
+                <div class="form-card-title">Tiempos</div>
+                <div class="form-card-sub">Motores y producción</div>
+            </div>
+        </a>
+        <a href="/empleado/pesos" class="form-card">
+            <div class="form-card-icon" style="background:#fff8e1;">⚖️</div>
+            <div>
+                <div class="form-card-title">Control Pesos</div>
+                <div class="form-card-sub">Producto a granel</div>
+            </div>
+        </a>
+        <a href="/empleado/granel" class="form-card">
+            <div class="form-card-icon" style="background:#e3f2fd;">📦</div>
+            <div>
+                <div class="form-card-title">Prod. Granel</div>
+                <div class="form-card-sub">Producción diaria</div>
+            </div>
+        </a>
+        <a href="/empleado/premix" class="form-card">
+            <div class="form-card-icon" style="background:#fce4ec;">🧪</div>
+            <div>
+                <div class="form-card-title">Premix</div>
+                <div class="form-card-sub">Mezcla por carga</div>
+            </div>
+        </a>
+        <a href="/empleado/conciliacion" class="form-card">
+            <div class="form-card-icon" style="background:#e0f7fa;">📊</div>
+            <div>
+                <div class="form-card-title">Conciliación</div>
+                <div class="form-card-sub">Materiales por turno</div>
+            </div>
+        </a>
+        <a href="/empleado/control-pt" class="form-card">
+            <div class="form-card-icon" style="background:#ede7f6;">🏭</div>
+            <div>
+                <div class="form-card-title">Control PT</div>
+                <div class="form-card-sub">Producto terminado</div>
+            </div>
+        </a>
+        <a href="/empleado/monitoreo" class="form-card">
+            <div class="form-card-icon" style="background:#f3e5f5;">🔍</div>
+            <div>
+                <div class="form-card-title">Monitoreo PCC2</div>
+                <div class="form-card-sub">Verificación empaque</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Tabla tiempos -->
+    <div class="seccion-header">
+        <div class="seccion-line"></div>
+        <div class="seccion-titulo">⏱️ Últimos registros de tiempos</div>
+        <div class="seccion-line"></div>
+    </div>
+    <div class="tabla-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Operador</th>
+                <th>Motores Inicio</th>
+                <th>Motores Fin</th>
+                <th>Prod. Inicio</th>
+                <th>Prod. Fin</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(registrosTiempos)}">
+                <td colspan="6" class="sin-registros">No hay registros aún</td>
+            </tr>
+            <tr th:each="r : ${registrosTiempos}">
+                <td><span class="badge-fecha" th:text="${r.fecha}"></span></td>
+                <td th:text="${r.operador}"></td>
+                <td th:text="${r.motoresInicio}"></td>
+                <td th:text="${r.motoresFin}"></td>
+                <td th:text="${r.produccionInicio}"></td>
+                <td th:text="${r.produccionFin}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tabla control PT -->
+    <div class="seccion-header">
+        <div class="seccion-line"></div>
+        <div class="seccion-titulo">🏭 Últimos registros de control PT</div>
+        <div class="seccion-line"></div>
+    </div>
+    <div class="tabla-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Producto</th>
+                <th>Lote</th>
+                <th>Total Unidades</th>
+                <th>Total Sacos</th>
+                <th>MP (kg)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(registrosPT)}">
+                <td colspan="6" class="sin-registros">No hay registros aún</td>
+            </tr>
+            <tr th:each="r : ${registrosPT}">
+                <td><span class="badge-fecha" th:text="${r.fecha}"></span></td>
+                <td th:text="${r.producto}"></td>
+                <td th:text="${r.lote}"></td>
+                <td th:text="${r.totalUnidades}"></td>
+                <td th:text="${r.totalSacos}"></td>
+                <td th:text="${r.materiaPrimaUtilizadaKg}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 </body>
 </html>

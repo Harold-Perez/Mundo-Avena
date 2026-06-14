@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface MezclaPremixRepository extends JpaRepository<MezclaPremix, Long> {
     List<MezclaPremix> findByUsuario(Usuario usuario);
-    List<MezclaPremix> findByFecha(LocalDate fecha);
-    List<MezclaPremix> findByFechaBetween(LocalDate inicio, LocalDate fin);
+    List<MezclaPremix> findByFechaInicioBetween(LocalDate inicio, LocalDate fin);
+    List<MezclaPremix> findByFechaInicioOrderByFechaInicioDesc(LocalDate fecha);
 }

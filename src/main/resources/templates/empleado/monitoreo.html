@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Monitoreo PCC2</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/validaciones.js"></script>
     <style>
         body { background-color: #f5f0e8; }
         .navbar { background-color: #2d5a27; }
@@ -17,9 +18,15 @@
         .pcc-item { display: flex; flex-direction: column; align-items: center; }
         .pcc-num { font-size: 10px; font-weight: 700; color: #2d5a27; margin-bottom: 2px; }
         .pcc-input { width: 100%; text-align: center; font-size: 12px; padding: 4px; border: 1px solid #ced4da; border-radius: 4px; }
+        .pcc-input:focus { border-color: #2d5a27; outline: none; }
         .list-group-item-action { cursor: pointer; }
         .list-group-item-action:hover { background-color: #f0f7ee; }
+        .btn-agregar { background-color: #f0f7ee; color: #2d5a27; border: 1px dashed #2d5a27; padding: 6px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-agregar:hover { background-color: #2d5a27; color: white; }
+        .btn-eliminar { background: none; border: none; color: #dc3545; font-size: 16px; cursor: pointer; }
+        .total-box { background-color: #2d5a27; color: white; border-radius: 12px; padding: 16px; text-align: center; }
     </style>
+    <script src="/js/validaciones.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-dark px-4 py-3">
@@ -32,17 +39,18 @@
 
     <form th:action="@{/empleado/monitoreo}" method="post">
 
+        <!-- Info General -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">Información General</h6>
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Producto</label>
                     <input type="text" class="form-control" name="producto"
-                           placeholder="Ej: Hojuela de Avena Nutremas 600g Promoción" required>
+                           placeholder="Ej: Hojuela de Avena Nutremas 600g" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Lote PT</label>
-                    <input type="text" class="form-control" name="lotePT" placeholder="Ej: 0926HM26">
+                    <input type="text" class="form-control" name="lotePT">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">Fecha Producción</label>
@@ -80,6 +88,7 @@
             </div>
         </div>
 
+        <!-- Tipo de Producto -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">📦 Tipo de Producto</h6>
             <div class="row g-3">
@@ -116,102 +125,127 @@
             </div>
         </div>
 
+        <!-- Proceso de Empaque DINAMICO -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">🏭 Proceso de Empaque</h6>
             <div class="table-responsive">
-                <table class="table table-bordered table-sm">
+                <table class="table table-bordered table-sm" id="tablaEmpaque">
                     <thead>
                     <tr>
+                        <th>#</th>
                         <th>Presentación y Cantidad</th>
                         <th>Números de Lote</th>
                         <th>Fecha Inicio</th>
                         <th>Fecha Fin</th>
                         <th>Hora Inicio</th>
                         <th>Hora Fin</th>
+                        <th></th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="empaqueBody">
                     <tr>
+                        <td class="text-center fw-bold fila-num">1</td>
                         <td><input type="text" class="form-control form-control-sm" name="empaque1Presentacion" placeholder="Ej: Bol. 600gr"></td>
                         <td><input type="text" class="form-control form-control-sm" name="empaque1Lote"></td>
                         <td><input type="date" class="form-control form-control-sm" name="empaque1FechaInicio"></td>
                         <td><input type="date" class="form-control form-control-sm" name="empaque1FechaFin"></td>
                         <td><input type="time" class="form-control form-control-sm" name="empaque1HoraInicio"></td>
                         <td><input type="time" class="form-control form-control-sm" name="empaque1HoraFin"></td>
+                        <td></td>
                     </tr>
                     <tr>
+                        <td class="text-center fw-bold fila-num">2</td>
                         <td><input type="text" class="form-control form-control-sm" name="empaque2Presentacion" placeholder="Ej: Saco. 40u"></td>
                         <td><input type="text" class="form-control form-control-sm" name="empaque2Lote"></td>
                         <td><input type="date" class="form-control form-control-sm" name="empaque2FechaInicio"></td>
                         <td><input type="date" class="form-control form-control-sm" name="empaque2FechaFin"></td>
                         <td><input type="time" class="form-control form-control-sm" name="empaque2HoraInicio"></td>
                         <td><input type="time" class="form-control form-control-sm" name="empaque2HoraFin"></td>
+                        <td></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+            <button type="button" class="btn-agregar mt-2" onclick="agregarFilaEmpaque()">
+                + Agregar fila
+            </button>
         </div>
 
+        <!-- Bolsas Individuales DINAMICO -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">⚖️ Monitoreo Control de Pesos — Bolsas Individuales</h6>
-            <div class="pcc-grid">
-                <div class="pcc-item"><span class="pcc-num">1</span><input type="number" step="0.01" class="pcc-input" name="bolsa1"></div>
-                <div class="pcc-item"><span class="pcc-num">2</span><input type="number" step="0.01" class="pcc-input" name="bolsa2"></div>
-                <div class="pcc-item"><span class="pcc-num">3</span><input type="number" step="0.01" class="pcc-input" name="bolsa3"></div>
-                <div class="pcc-item"><span class="pcc-num">4</span><input type="number" step="0.01" class="pcc-input" name="bolsa4"></div>
-                <div class="pcc-item"><span class="pcc-num">5</span><input type="number" step="0.01" class="pcc-input" name="bolsa5"></div>
-                <div class="pcc-item"><span class="pcc-num">6</span><input type="number" step="0.01" class="pcc-input" name="bolsa6"></div>
-                <div class="pcc-item"><span class="pcc-num">7</span><input type="number" step="0.01" class="pcc-input" name="bolsa7"></div>
-                <div class="pcc-item"><span class="pcc-num">8</span><input type="number" step="0.01" class="pcc-input" name="bolsa8"></div>
-                <div class="pcc-item"><span class="pcc-num">9</span><input type="number" step="0.01" class="pcc-input" name="bolsa9"></div>
-                <div class="pcc-item"><span class="pcc-num">10</span><input type="number" step="0.01" class="pcc-input" name="bolsa10"></div>
-                <div class="pcc-item"><span class="pcc-num">11</span><input type="number" step="0.01" class="pcc-input" name="bolsa11"></div>
-                <div class="pcc-item"><span class="pcc-num">12</span><input type="number" step="0.01" class="pcc-input" name="bolsa12"></div>
-                <div class="pcc-item"><span class="pcc-num">13</span><input type="number" step="0.01" class="pcc-input" name="bolsa13"></div>
-                <div class="pcc-item"><span class="pcc-num">14</span><input type="number" step="0.01" class="pcc-input" name="bolsa14"></div>
-                <div class="pcc-item"><span class="pcc-num">15</span><input type="number" step="0.01" class="pcc-input" name="bolsa15"></div>
-                <div class="pcc-item"><span class="pcc-num">16</span><input type="number" step="0.01" class="pcc-input" name="bolsa16"></div>
-                <div class="pcc-item"><span class="pcc-num">17</span><input type="number" step="0.01" class="pcc-input" name="bolsa17"></div>
-                <div class="pcc-item"><span class="pcc-num">18</span><input type="number" step="0.01" class="pcc-input" name="bolsa18"></div>
-                <div class="pcc-item"><span class="pcc-num">19</span><input type="number" step="0.01" class="pcc-input" name="bolsa19"></div>
-                <div class="pcc-item"><span class="pcc-num">20</span><input type="number" step="0.01" class="pcc-input" name="bolsa20"></div>
-                <div class="pcc-item"><span class="pcc-num">21</span><input type="number" step="0.01" class="pcc-input" name="bolsa21"></div>
-                <div class="pcc-item"><span class="pcc-num">22</span><input type="number" step="0.01" class="pcc-input" name="bolsa22"></div>
-                <div class="pcc-item"><span class="pcc-num">23</span><input type="number" step="0.01" class="pcc-input" name="bolsa23"></div>
-                <div class="pcc-item"><span class="pcc-num">24</span><input type="number" step="0.01" class="pcc-input" name="bolsa24"></div>
+            <div class="pcc-grid" id="gridBolsas">
+                <div class="pcc-item"><span class="pcc-num">1</span><input type="number" step="0.01" class="pcc-input" name="bolsa1" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">2</span><input type="number" step="0.01" class="pcc-input" name="bolsa2" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">3</span><input type="number" step="0.01" class="pcc-input" name="bolsa3" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">4</span><input type="number" step="0.01" class="pcc-input" name="bolsa4" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">5</span><input type="number" step="0.01" class="pcc-input" name="bolsa5" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">6</span><input type="number" step="0.01" class="pcc-input" name="bolsa6" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">7</span><input type="number" step="0.01" class="pcc-input" name="bolsa7" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">8</span><input type="number" step="0.01" class="pcc-input" name="bolsa8" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">9</span><input type="number" step="0.01" class="pcc-input" name="bolsa9" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">10</span><input type="number" step="0.01" class="pcc-input" name="bolsa10" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">11</span><input type="number" step="0.01" class="pcc-input" name="bolsa11" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">12</span><input type="number" step="0.01" class="pcc-input" name="bolsa12" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">13</span><input type="number" step="0.01" class="pcc-input" name="bolsa13" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">14</span><input type="number" step="0.01" class="pcc-input" name="bolsa14" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">15</span><input type="number" step="0.01" class="pcc-input" name="bolsa15" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">16</span><input type="number" step="0.01" class="pcc-input" name="bolsa16" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">17</span><input type="number" step="0.01" class="pcc-input" name="bolsa17" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">18</span><input type="number" step="0.01" class="pcc-input" name="bolsa18" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">19</span><input type="number" step="0.01" class="pcc-input" name="bolsa19" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">20</span><input type="number" step="0.01" class="pcc-input" name="bolsa20" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">21</span><input type="number" step="0.01" class="pcc-input" name="bolsa21" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">22</span><input type="number" step="0.01" class="pcc-input" name="bolsa22" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">23</span><input type="number" step="0.01" class="pcc-input" name="bolsa23" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+                <div class="pcc-item"><span class="pcc-num">24</span><input type="number" step="0.01" class="pcc-input" name="bolsa24" oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')"></div>
+            </div>
+            <button type="button" class="btn-agregar mt-3" onclick="agregarBolsa()">+ Agregar bolsa</button>
+            <div class="row mt-3">
+                <div class="col-md-4"><div class="total-box"><div class="fs-6 mb-1">Total Bolsas</div><div class="fs-2 fw-bold" id="totalBolsas">0</div></div></div>
+                <div class="col-md-4"><div class="total-box"><div class="fs-6 mb-1">Total Kg</div><div class="fs-2 fw-bold" id="totalKgBolsas">0.00</div></div></div>
+                <div class="col-md-4"><div class="total-box"><div class="fs-6 mb-1">Peso Promedio</div><div class="fs-2 fw-bold" id="promedioBolsas">0.00</div></div></div>
             </div>
         </div>
 
+        <!-- Sacos DINAMICO -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">⚖️ Monitoreo Control de Pesos — Sacos</h6>
-            <div class="pcc-grid">
-                <div class="pcc-item"><span class="pcc-num">1</span><input type="number" step="0.01" class="pcc-input" name="sacoM1"></div>
-                <div class="pcc-item"><span class="pcc-num">2</span><input type="number" step="0.01" class="pcc-input" name="sacoM2"></div>
-                <div class="pcc-item"><span class="pcc-num">3</span><input type="number" step="0.01" class="pcc-input" name="sacoM3"></div>
-                <div class="pcc-item"><span class="pcc-num">4</span><input type="number" step="0.01" class="pcc-input" name="sacoM4"></div>
-                <div class="pcc-item"><span class="pcc-num">5</span><input type="number" step="0.01" class="pcc-input" name="sacoM5"></div>
-                <div class="pcc-item"><span class="pcc-num">6</span><input type="number" step="0.01" class="pcc-input" name="sacoM6"></div>
-                <div class="pcc-item"><span class="pcc-num">7</span><input type="number" step="0.01" class="pcc-input" name="sacoM7"></div>
-                <div class="pcc-item"><span class="pcc-num">8</span><input type="number" step="0.01" class="pcc-input" name="sacoM8"></div>
-                <div class="pcc-item"><span class="pcc-num">9</span><input type="number" step="0.01" class="pcc-input" name="sacoM9"></div>
-                <div class="pcc-item"><span class="pcc-num">10</span><input type="number" step="0.01" class="pcc-input" name="sacoM10"></div>
-                <div class="pcc-item"><span class="pcc-num">11</span><input type="number" step="0.01" class="pcc-input" name="sacoM11"></div>
-                <div class="pcc-item"><span class="pcc-num">12</span><input type="number" step="0.01" class="pcc-input" name="sacoM12"></div>
-                <div class="pcc-item"><span class="pcc-num">13</span><input type="number" step="0.01" class="pcc-input" name="sacoM13"></div>
-                <div class="pcc-item"><span class="pcc-num">14</span><input type="number" step="0.01" class="pcc-input" name="sacoM14"></div>
-                <div class="pcc-item"><span class="pcc-num">15</span><input type="number" step="0.01" class="pcc-input" name="sacoM15"></div>
-                <div class="pcc-item"><span class="pcc-num">16</span><input type="number" step="0.01" class="pcc-input" name="sacoM16"></div>
-                <div class="pcc-item"><span class="pcc-num">17</span><input type="number" step="0.01" class="pcc-input" name="sacoM17"></div>
-                <div class="pcc-item"><span class="pcc-num">18</span><input type="number" step="0.01" class="pcc-input" name="sacoM18"></div>
-                <div class="pcc-item"><span class="pcc-num">19</span><input type="number" step="0.01" class="pcc-input" name="sacoM19"></div>
-                <div class="pcc-item"><span class="pcc-num">20</span><input type="number" step="0.01" class="pcc-input" name="sacoM20"></div>
-                <div class="pcc-item"><span class="pcc-num">21</span><input type="number" step="0.01" class="pcc-input" name="sacoM21"></div>
-                <div class="pcc-item"><span class="pcc-num">22</span><input type="number" step="0.01" class="pcc-input" name="sacoM22"></div>
-                <div class="pcc-item"><span class="pcc-num">23</span><input type="number" step="0.01" class="pcc-input" name="sacoM23"></div>
-                <div class="pcc-item"><span class="pcc-num">24</span><input type="number" step="0.01" class="pcc-input" name="sacoM24"></div>
+            <div class="pcc-grid" id="gridSacos">
+                <div class="pcc-item"><span class="pcc-num">1</span><input type="number" step="0.01" class="pcc-input" name="sacoM1" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">2</span><input type="number" step="0.01" class="pcc-input" name="sacoM2" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">3</span><input type="number" step="0.01" class="pcc-input" name="sacoM3" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">4</span><input type="number" step="0.01" class="pcc-input" name="sacoM4" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">5</span><input type="number" step="0.01" class="pcc-input" name="sacoM5" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">6</span><input type="number" step="0.01" class="pcc-input" name="sacoM6" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">7</span><input type="number" step="0.01" class="pcc-input" name="sacoM7" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">8</span><input type="number" step="0.01" class="pcc-input" name="sacoM8" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">9</span><input type="number" step="0.01" class="pcc-input" name="sacoM9" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">10</span><input type="number" step="0.01" class="pcc-input" name="sacoM10" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">11</span><input type="number" step="0.01" class="pcc-input" name="sacoM11" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">12</span><input type="number" step="0.01" class="pcc-input" name="sacoM12" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">13</span><input type="number" step="0.01" class="pcc-input" name="sacoM13" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">14</span><input type="number" step="0.01" class="pcc-input" name="sacoM14" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">15</span><input type="number" step="0.01" class="pcc-input" name="sacoM15" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">16</span><input type="number" step="0.01" class="pcc-input" name="sacoM16" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">17</span><input type="number" step="0.01" class="pcc-input" name="sacoM17" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">18</span><input type="number" step="0.01" class="pcc-input" name="sacoM18" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">19</span><input type="number" step="0.01" class="pcc-input" name="sacoM19" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">20</span><input type="number" step="0.01" class="pcc-input" name="sacoM20" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">21</span><input type="number" step="0.01" class="pcc-input" name="sacoM21" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">22</span><input type="number" step="0.01" class="pcc-input" name="sacoM22" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">23</span><input type="number" step="0.01" class="pcc-input" name="sacoM23" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+                <div class="pcc-item"><span class="pcc-num">24</span><input type="number" step="0.01" class="pcc-input" name="sacoM24" oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')"></div>
+            </div>
+            <button type="button" class="btn-agregar mt-3" onclick="agregarSaco()">+ Agregar saco</button>
+            <div class="row mt-3">
+                <div class="col-md-4"><div class="total-box"><div class="fs-6 mb-1">Total Sacos</div><div class="fs-2 fw-bold" id="totalSacosPCC">0</div></div></div>
+                <div class="col-md-4"><div class="total-box"><div class="fs-6 mb-1">Total Kg</div><div class="fs-2 fw-bold" id="totalKgSacos">0.00</div></div></div>
+                <div class="col-md-4"><div class="total-box"><div class="fs-6 mb-1">Peso Promedio</div><div class="fs-2 fw-bold" id="promedioSacos">0.00</div></div></div>
             </div>
         </div>
 
+        <!-- Detector de Metales -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">🔧 Verificación Detector de Metales PCC2</h6>
             <div class="form-check">
@@ -220,6 +254,7 @@
             </div>
         </div>
 
+        <!-- Rendimiento -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">📊 Rendimiento</h6>
             <div class="table-responsive">
@@ -259,6 +294,7 @@
             </div>
         </div>
 
+        <!-- Observaciones -->
         <div class="card p-4 mb-4">
             <h6 class="section-title">📝 Observaciones</h6>
             <textarea class="form-control" name="observaciones" rows="3"
@@ -273,13 +309,71 @@
 </div>
 
 <script>
+    // ── EMPAQUE DINAMICO ──
+    let filaEmpaque = 2;
+    function agregarFilaEmpaque() {
+        filaEmpaque++;
+        const n = filaEmpaque;
+        const tbody = document.getElementById('empaqueBody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="text-center fw-bold">${n}</td>
+            <td><input type="text" class="form-control form-control-sm" name="empaque${n}Presentacion"></td>
+            <td><input type="text" class="form-control form-control-sm" name="empaque${n}Lote"></td>
+            <td><input type="date" class="form-control form-control-sm" name="empaque${n}FechaInicio"></td>
+            <td><input type="date" class="form-control form-control-sm" name="empaque${n}FechaFin"></td>
+            <td><input type="time" class="form-control form-control-sm" name="empaque${n}HoraInicio"></td>
+            <td><input type="time" class="form-control form-control-sm" name="empaque${n}HoraFin"></td>
+            <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove()">✕</button></td>`;
+        tbody.appendChild(tr);
+    }
+
+    // ── BOLSAS DINAMICO ──
+    let numBolsa = 24;
+    function agregarBolsa() {
+        numBolsa++;
+        const grid = document.getElementById('gridBolsas');
+        const div = document.createElement('div');
+        div.className = 'pcc-item';
+        div.innerHTML = `<span class="pcc-num">${numBolsa}</span>
+            <input type="number" step="0.01" class="pcc-input" name="bolsa${numBolsa}"
+            oninput="calcTotales('gridBolsas','totalBolsas','totalKgBolsas','promedioBolsas')">`;
+        grid.appendChild(div);
+    }
+
+    // ── SACOS DINAMICO ──
+    let numSaco = 24;
+    function agregarSaco() {
+        numSaco++;
+        const grid = document.getElementById('gridSacos');
+        const div = document.createElement('div');
+        div.className = 'pcc-item';
+        div.innerHTML = `<span class="pcc-num">${numSaco}</span>
+            <input type="number" step="0.01" class="pcc-input" name="sacoM${numSaco}"
+            oninput="calcTotales('gridSacos','totalSacosPCC','totalKgSacos','promedioSacos')">`;
+        grid.appendChild(div);
+    }
+
+    // ── CALCULAR TOTALES ──
+    function calcTotales(gridId, totalId, kgId, promedioId) {
+        const inputs = document.querySelectorAll(`#${gridId} input`);
+        let total = 0; let count = 0;
+        inputs.forEach(input => {
+            const val = parseFloat(input.value);
+            if (!isNaN(val) && val > 0) { total += val; count++; }
+        });
+        document.getElementById(totalId).textContent = count;
+        document.getElementById(kgId).textContent = total.toFixed(2);
+        document.getElementById(promedioId).textContent = count > 0 ? (total / count).toFixed(2) : '0.00';
+    }
+
+    // ── RENDIMIENTO ──
     function calcRendMP() {
         const cant = parseFloat(document.getElementById('mpCant').value) || 0;
         const pt = parseFloat(document.getElementById('mpPT').value) || 0;
         document.getElementById('mpTotal').value = cant.toFixed(2);
         if (cant > 0) document.getElementById('mpRend').value = ((pt / cant) * 100).toFixed(2);
     }
-
     function calcRendEmp() {
         const cant = parseFloat(document.getElementById('empCant').value) || 0;
         const pt = parseFloat(document.getElementById('empPT').value) || 0;
@@ -287,6 +381,7 @@
         if (cant > 0) document.getElementById('empRend').value = ((pt / cant) * 100).toFixed(2);
     }
 
+    // ── AUTOCOMPLETE ──
     function initAutocomplete(inputId, suggestionsId) {
         const input = document.getElementById(inputId);
         const suggestions = document.getElementById(suggestionsId);

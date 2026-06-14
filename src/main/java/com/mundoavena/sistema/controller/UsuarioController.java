@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin/usuarios")
@@ -18,8 +19,15 @@ public class UsuarioController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("usuarios", usuarioService.listarTodos());
-        model.addAttribute("titulo", "Gestión de Usuarios");
+        List<Usuario> usuarios = usuarioService.listarTodos();
+        long totalActivos = usuarios.stream().filter(u -> u.isActivo()).count();
+        long totalEmpleados = usuarios.stream().filter(u -> u.getRol() == Rol.EMPLEADO).count();
+        long totalGerencia = usuarios.stream().filter(u -> u.getRol() == Rol.GERENCIA).count();
+
+        model.addAttribute("usuarios", usuarios);
+        model.addAttribute("totalActivos", totalActivos);
+        model.addAttribute("totalEmpleados", totalEmpleados);
+        model.addAttribute("totalGerencia", totalGerencia);
         return "admin/usuarios/listar";
     }
 
@@ -27,7 +35,6 @@ public class UsuarioController {
     public String formNuevo(Model model) {
         model.addAttribute("usuario", new Usuario());
         model.addAttribute("roles", Rol.values());
-        model.addAttribute("titulo", "Nuevo Usuario");
         return "admin/usuarios/form";
     }
 
@@ -49,7 +56,6 @@ public class UsuarioController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         model.addAttribute("usuario", usuario);
         model.addAttribute("roles", Rol.values());
-        model.addAttribute("titulo", "Editar Usuario");
         return "admin/usuarios/form";
     }
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Control de Pesos a Granel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/validaciones.js"></script>
     <style>
         body { background-color: #f5f0e8; }
         .navbar { background-color: #2d5a27; }
@@ -19,7 +20,10 @@
         .total-box { background-color: #2d5a27; color: white; border-radius: 12px; padding: 20px; text-align: center; }
         .list-group-item-action { cursor: pointer; }
         .list-group-item-action:hover { background-color: #f0f7ee; }
+        .btn-agregar { background-color: #f0f7ee; color: #2d5a27; border: 1px dashed #2d5a27; padding: 6px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-agregar:hover { background-color: #2d5a27; color: white; }
     </style>
+    <script src="/js/validaciones.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-dark px-4 py-3">
@@ -65,14 +69,19 @@
                     <div id="operadorSuggestions" class="list-group position-absolute w-100"
                          style="z-index:1000; display:none;"></div>
                 </div>
-                <div class="col-md-6 position-relative">
+
+                <!-- Envasadores multiselect -->
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Envasadores</label>
-                    <input type="text" class="form-control" name="envasadores"
-                           id="envasadoresInput"
-                           placeholder="Escribe para buscar envasador..."
-                           autocomplete="off">
-                    <div id="envasadoresSuggestions" class="list-group position-absolute w-100"
-                         style="z-index:1000; display:none;"></div>
+                    <div class="border rounded p-2 mb-1" id="envasadoresSeleccionados"
+                         style="min-height:38px; background:white; display:flex; flex-wrap:wrap; gap:4px;"></div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control" id="envasadorSearch"
+                               placeholder="Escribe para agregar envasador..." autocomplete="off">
+                        <div id="envasadoresSuggestions" class="list-group position-absolute w-100"
+                             style="z-index:1000; display:none;"></div>
+                    </div>
+                    <input type="hidden" name="envasadores" id="envasadoresHidden">
                 </div>
             </div>
         </div>
@@ -80,7 +89,7 @@
         <div class="card p-4 mb-4">
             <h6 class="section-title">⚖️ Pesos por Saco (kg)</h6>
             <p class="text-muted small mb-3">Ingresa el peso de cada saco. Los campos vacíos se omiten automáticamente.</p>
-            <div class="saco-grid">
+            <div class="saco-grid" id="sacoGrid">
                 <div class="saco-item"><span class="saco-num">1</span><input type="number" step="0.01" class="saco-input" name="saco1" oninput="calcTotal()"></div>
                 <div class="saco-item"><span class="saco-num">2</span><input type="number" step="0.01" class="saco-input" name="saco2" oninput="calcTotal()"></div>
                 <div class="saco-item"><span class="saco-num">3</span><input type="number" step="0.01" class="saco-input" name="saco3" oninput="calcTotal()"></div>
@@ -153,6 +162,10 @@
                 <div class="saco-item"><span class="saco-num">70</span><input type="number" step="0.01" class="saco-input" name="saco70" oninput="calcTotal()"></div>
             </div>
 
+            <button type="button" class="btn-agregar mt-3" onclick="agregarSaco()">
+                + Agregar saco
+            </button>
+
             <div class="row mt-4">
                 <div class="col-md-4">
                     <div class="total-box">
@@ -189,6 +202,20 @@
 </div>
 
 <script>
+    // ── SACO DINAMICO ──
+    let numSaco = 70;
+    function agregarSaco() {
+        numSaco++;
+        const grid = document.getElementById('sacoGrid');
+        const div = document.createElement('div');
+        div.className = 'saco-item';
+        div.innerHTML = `<span class="saco-num">${numSaco}</span>
+            <input type="number" step="0.01" class="saco-input" name="saco${numSaco}"
+            oninput="calcTotal()">`;
+        grid.appendChild(div);
+    }
+
+    // ── CALCULAR TOTALES ──
     function calcTotal() {
         const inputs = document.querySelectorAll('.saco-input');
         let total = 0; let sacos = 0;
@@ -201,6 +228,62 @@
         document.getElementById('displayPromedio').textContent = sacos > 0 ? (total / sacos).toFixed(2) : '0.00';
     }
 
+    // ── MULTISELECT ENVASADORES ──
+    function initMultiSelect(searchId, suggestionsId, selectedDivId, hiddenId) {
+        const search = document.getElementById(searchId);
+        const suggestions = document.getElementById(suggestionsId);
+        const selectedDiv = document.getElementById(selectedDivId);
+        const hidden = document.getElementById(hiddenId);
+        let selected = [];
+
+        function updateHidden() {
+            hidden.value = selected.join(', ');
+        }
+
+        function addTag(nombre) {
+            if (selected.includes(nombre)) return;
+            selected.push(nombre);
+            const tag = document.createElement('span');
+            tag.style.cssText = 'background:#2d5a27; color:white; padding:4px 8px; border-radius:6px; font-size:12px; display:flex; align-items:center; gap:4px;';
+            tag.innerHTML = `${nombre} <button type="button" style="background:none;border:none;color:white;padding:0;font-size:14px;line-height:1;cursor:pointer;">×</button>`;
+            tag.querySelector('button').onclick = () => {
+                tag.remove();
+                selected = selected.filter(v => v !== nombre);
+                updateHidden();
+            };
+            selectedDiv.appendChild(tag);
+            updateHidden();
+            search.value = '';
+            suggestions.style.display = 'none';
+        }
+
+        search.addEventListener('input', function() {
+            const val = this.value.trim();
+            suggestions.innerHTML = '';
+            if (val.length < 1) { suggestions.style.display = 'none'; return; }
+            fetch('/api/usuarios/buscar?q=' + encodeURIComponent(val))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) { suggestions.style.display = 'none'; return; }
+                    data.forEach(nombre => {
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'list-group-item list-group-item-action';
+                        item.textContent = nombre;
+                        item.onclick = () => addTag(nombre);
+                        suggestions.appendChild(item);
+                    });
+                    suggestions.style.display = 'block';
+                });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!search.contains(e.target) && !suggestions.contains(e.target))
+                suggestions.style.display = 'none';
+        });
+    }
+
+    // ── AUTOCOMPLETE OPERADOR ──
     function initAutocomplete(inputId, suggestionsId) {
         const input = document.getElementById(inputId);
         const suggestions = document.getElementById(suggestionsId);
@@ -231,7 +314,7 @@
     }
 
     initAutocomplete('operadorInput', 'operadorSuggestions');
-    initAutocomplete('envasadoresInput', 'envasadoresSuggestions');
+    initMultiSelect('envasadorSearch', 'envasadoresSuggestions', 'envasadoresSeleccionados', 'envasadoresHidden');
 </script>
 </body>
 </html>
