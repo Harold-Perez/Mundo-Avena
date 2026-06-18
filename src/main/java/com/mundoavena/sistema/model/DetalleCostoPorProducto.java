@@ -22,14 +22,12 @@ public class DetalleCostoPorProducto {
     @Column(nullable = false, length = 50)
     private String presentacion;
 
-    // Produccion
     @Column(nullable = false)
     private Integer unidadesProducidas;
 
     @Column(nullable = false)
     private Double kgProducidos;
 
-    // Costos MP
     @Column(nullable = false)
     private Double costoAvena = 0.0;
 
@@ -45,7 +43,6 @@ public class DetalleCostoPorProducto {
     @Column(nullable = false)
     private Double costoEmpaque = 0.0;
 
-    // Costos conversion
     @Column(nullable = false)
     private Double costoEE = 0.0;
 
@@ -55,7 +52,6 @@ public class DetalleCostoPorProducto {
     @Column(nullable = false)
     private Double costoMO = 0.0;
 
-    // Totales
     @Column(nullable = false)
     private Double costoTotalQ = 0.0;
 
@@ -64,4 +60,31 @@ public class DetalleCostoPorProducto {
 
     @Column(nullable = false)
     private Double costoUnitarioUSD = 0.0;
+
+    // =============================================
+    // Campos de formateo — NO se persisten en BD
+    // =============================================
+    @Transient
+    private String costoAvenaFmt;
+
+    @Transient
+    private String costoEEFmt;
+
+    @Transient
+    private String costoVaporFmt;
+
+    @Transient
+    private String costoMOFmt;
+
+    @Transient
+    private String costoTotalQFmt;
+
+    @Transient
+    private String costoUnitarioQFmt;
+
+    @Transient
+    private String costoUnitarioUSDFmt;
+
+    @Transient
+    private String kgProducidosFmt;
 }

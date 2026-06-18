@@ -10,8 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/gerencia")
@@ -25,6 +27,9 @@ public class GerenciaController {
     @Autowired private ControlPesosGranelService controlPesosService;
     @Autowired private MezclaPremixService mezclaPremixService;
     @Autowired private UsuarioRepository usuarioRepository;
+
+    // Formateador con locale US: coma para miles, punto para decimales
+    private static final NumberFormat NF = NumberFormat.getNumberInstance(Locale.US);
 
     @GetMapping("/dashboard")
     public String dashboard(Model model, Authentication auth) {
@@ -138,13 +143,45 @@ public class GerenciaController {
                 .findFirst().orElseThrow();
         List<DetalleCostoPorProducto> detalles = cierreService.obtenerDetalles(cierre);
 
+        // Formateo en Java con Locale.US — coma para miles, punto para decimales
+        NumberFormat nf2 = NumberFormat.getNumberInstance(Locale.US);
+        nf2.setMinimumFractionDigits(2);
+        nf2.setMaximumFractionDigits(2);
+
+        NumberFormat nf4 = NumberFormat.getNumberInstance(Locale.US);
+        nf4.setMinimumFractionDigits(4);
+        nf4.setMaximumFractionDigits(4);
+
         double totalCostoMes = detalles.stream()
                 .mapToDouble(d -> d.getCostoTotalQ())
                 .sum();
 
         model.addAttribute("cierre", cierre);
         model.addAttribute("detalles", detalles);
-        model.addAttribute("totalCostoMes", String.format("Q%,.0f", totalCostoMes));
+        model.addAttribute("totalCostoMes", "Q" + nf2.format(totalCostoMes));
+
+        // Parámetros formateados
+        model.addAttribute("costoAvenaFmt",    nf4.format(cierre.getCostoAvenaKg()));
+        model.addAttribute("costoHarinaFmt",   nf4.format(cierre.getCostoHarinaKg()));
+        model.addAttribute("costoCarbonatoFmt",nf4.format(cierre.getCostoCarbonatoKg()));
+        model.addAttribute("costoVitaminasFmt",nf4.format(cierre.getCostoVitaminasKg()));
+        model.addAttribute("costoEEFmt",       nf4.format(cierre.getCostoEEPorKg()));
+        model.addAttribute("costoVaporFmt",    nf4.format(cierre.getCostoVaporPorKg()));
+        model.addAttribute("costoMOFmt",       nf4.format(cierre.getCostoMOPorKg()));
+        model.addAttribute("tipoCambioFmt",    "Q" + nf2.format(cierre.getTipoCambio()));
+
+        // Detalles formateados
+        for (DetalleCostoPorProducto d : detalles) {
+            d.setCostoAvenaFmt(    "Q" + nf2.format(d.getCostoAvena()));
+            d.setCostoEEFmt(       "Q" + nf2.format(d.getCostoEE()));
+            d.setCostoVaporFmt(    "Q" + nf2.format(d.getCostoVapor()));
+            d.setCostoMOFmt(       "Q" + nf2.format(d.getCostoMO()));
+            d.setCostoTotalQFmt(   "Q" + nf2.format(d.getCostoTotalQ()));
+            d.setCostoUnitarioQFmt("Q" + nf4.format(d.getCostoUnitarioQ()));
+            d.setCostoUnitarioUSDFmt("$" + nf4.format(d.getCostoUnitarioUSD()));
+            d.setKgProducidosFmt(  nf2.format(d.getKgProducidos()));
+        }
+
         return "gerencia/ver-cierre";
     }
 

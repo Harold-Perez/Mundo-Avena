@@ -7,7 +7,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #f5f0e8; font-family: 'Segoe UI', sans-serif; }
-
         .navbar { background: #2d5a27; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
         .nav-left { display: flex; align-items: center; gap: 12px; }
         .nav-logo { background: white; border-radius: 6px; padding: 5px 10px; }
@@ -17,29 +16,23 @@
         .nav-right { display: flex; gap: 8px; align-items: center; }
         .nav-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 6px; padding: 5px 14px; font-size: 11px; text-decoration: none; }
         .nav-btn:hover { background: rgba(255,255,255,0.2); color: white; text-decoration: none; }
-
         .content { padding: 28px; }
-
         .cierre-header { background: white; border-radius: 14px; padding: 24px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
         .cierre-titulo { font-size: 22px; font-weight: 700; color: #1a2e1a; margin-bottom: 6px; }
         .badge-confirmado { background: #f0f7ee; color: #2d5a27; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; display: inline-block; }
         .badge-borrador { background: #fff8e1; color: #b28c65; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; display: inline-block; }
         .btn-confirmar { background: #2d5a27; color: white; border: none; border-radius: 10px; padding: 10px 24px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .btn-confirmar:hover { background: #1e3d1a; transform: translateY(-1px); }
-
         .alerta-exito { background: #f0f7ee; border-left: 4px solid #2d5a27; border-radius: 8px; padding: 12px 16px; color: #2d5a27; font-size: 13px; margin-bottom: 20px; }
-
         .params-card { background: white; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
         .params-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #b28c65; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #f0ebe3; }
         .param-item { text-align: center; padding: 12px; background: #faf9f7; border-radius: 10px; }
         .param-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         .param-value { font-size: 15px; font-weight: 700; color: #2d5a27; }
-
         .tabla-card { background: white; border-radius: 14px; overflow: hidden; margin-bottom: 20px; }
         .tabla-head { background: #1a2e1a; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
         .tabla-head-title { color: white; font-size: 13px; font-weight: 600; }
         .tabla-head-badge { background: #b28c65; color: white; font-size: 9px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
-
         table { width: 100%; border-collapse: collapse; }
         thead th { background: #f5f0e8; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #2d5a27; padding: 9px 14px; letter-spacing: 0.5px; text-align: right; }
         thead th:first-child { text-align: left; }
@@ -47,13 +40,10 @@
         tbody td:first-child { text-align: left; font-weight: 600; color: #1a2e1a; }
         tbody tr:last-child td { border-bottom: none; }
         tbody tr:hover td { background: #faf9f7; }
-
         .q-unidad { color: #2d5a27; font-weight: 700; font-size: 13px; }
         .usd-unidad { color: #185FA5; font-weight: 700; font-size: 13px; }
         .costo-total { color: #1a2e1a; font-weight: 700; }
-
         .sin-registros { text-align: center; color: #aaa; padding: 32px; font-size: 13px; }
-
         .resumen-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
         .resumen-stat { background: white; border-radius: 12px; padding: 18px; border-top: 3px solid; text-align: center; }
         .resumen-stat.v { border-top-color: #2d5a27; }
@@ -124,11 +114,11 @@
             <div class="resumen-l">Costo total del mes</div>
         </div>
         <div class="resumen-stat a">
-            <div class="resumen-n" th:text="${cierre.costoAvenaKg}">0</div>
+            <div class="resumen-n" th:text="'Q' + ${costoAvenaFmt}">0</div>
             <div class="resumen-l">Q/kg avena utilizado</div>
         </div>
         <div class="resumen-stat r">
-            <div class="resumen-n" th:text="'Q' + ${cierre.tipoCambio}">0</div>
+            <div class="resumen-n" th:text="${tipoCambioFmt}">0</div>
             <div class="resumen-l">Tipo de cambio</div>
         </div>
     </div>
@@ -140,49 +130,49 @@
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">Avena (Q/kg)</div>
-                    <div class="param-value" th:text="${cierre.costoAvenaKg}"></div>
+                    <div class="param-value" th:text="${costoAvenaFmt}"></div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">Harina (Q/kg)</div>
-                    <div class="param-value" th:text="${cierre.costoHarinaKg}"></div>
+                    <div class="param-value" th:text="${costoHarinaFmt}"></div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">Carbonato (Q/kg)</div>
-                    <div class="param-value" th:text="${cierre.costoCarbonatoKg}"></div>
+                    <div class="param-value" th:text="${costoCarbonatoFmt}"></div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">Vitaminas (Q/kg)</div>
-                    <div class="param-value" th:text="${cierre.costoVitaminasKg}"></div>
+                    <div class="param-value" th:text="${costoVitaminasFmt}"></div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">EE (Q/kg)</div>
-                    <div class="param-value" th:text="${cierre.costoEEPorKg}"></div>
+                    <div class="param-value" th:text="${costoEEFmt}"></div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">Vapor (Q/kg)</div>
-                    <div class="param-value" th:text="${cierre.costoVaporPorKg}"></div>
+                    <div class="param-value" th:text="${costoVaporFmt}"></div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">Mano de Obra (Q/kg)</div>
-                    <div class="param-value" th:text="${cierre.costoMOPorKg}"></div>
+                    <div class="param-value" th:text="${costoMOFmt}"></div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-4">
                 <div class="param-item">
                     <div class="param-label">Tipo de Cambio</div>
-                    <div class="param-value" th:text="'Q' + ${cierre.tipoCambio}"></div>
+                    <div class="param-value" th:text="${tipoCambioFmt}"></div>
                 </div>
             </div>
         </div>
@@ -220,14 +210,14 @@
                 <tr th:each="d : ${detalles}">
                     <td th:text="${d.producto}"></td>
                     <td th:text="${#numbers.formatInteger(d.unidadesProducidas, 1, 'COMMA')}"></td>
-                    <td th:text="${#numbers.formatDecimal(d.kgProducidos, 1, 2)}"></td>
-                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoAvena, 1, 2)}"></td>
-                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoEE, 1, 2)}"></td>
-                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoVapor, 1, 2)}"></td>
-                    <td th:text="${'Q' + #numbers.formatDecimal(d.costoMO, 1, 2)}"></td>
-                    <td class="costo-total" th:text="${'Q' + #numbers.formatDecimal(d.costoTotalQ, 1, 2)}"></td>
-                    <td class="q-unidad" th:text="${'Q' + #numbers.formatDecimal(d.costoUnitarioQ, 1, 4)}"></td>
-                    <td class="usd-unidad" th:text="${'$' + #numbers.formatDecimal(d.costoUnitarioUSD, 1, 4)}"></td>
+                    <td th:text="${d.kgProducidosFmt}"></td>
+                    <td th:text="${d.costoAvenaFmt}"></td>
+                    <td th:text="${d.costoEEFmt}"></td>
+                    <td th:text="${d.costoVaporFmt}"></td>
+                    <td th:text="${d.costoMOFmt}"></td>
+                    <td class="costo-total" th:text="${d.costoTotalQFmt}"></td>
+                    <td class="q-unidad" th:text="${d.costoUnitarioQFmt}"></td>
+                    <td class="usd-unidad" th:text="${d.costoUnitarioUSDFmt}"></td>
                 </tr>
                 </tbody>
             </table>
