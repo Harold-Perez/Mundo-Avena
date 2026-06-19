@@ -159,7 +159,10 @@
 
         <!-- Logo -->
         <div class="logo-container">
-            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+            <img th:src="@{/img/logo-mundoavena.png(v=${T(java.lang.System).currentTimeMillis()})}"
+                 alt="Mundo Avena"
+                 loading="eager"
+                 fetchpriority="high">
         </div>
 
         <!-- Título -->
@@ -171,12 +174,12 @@
 
         <!-- Error -->
         <div th:if="${param.error}" class="error-msg">
-            ⚠️ Usuario o contraseña incorrectos
+            Usuario o contraseña incorrectos
         </div>
 
         <!-- Logout -->
         <div th:if="${param.logout}" class="alert alert-success text-center" style="border-radius:10px; font-size:13px;">
-            ✅ Sesión cerrada correctamente
+            Sesión cerrada correctamente
         </div>
 
         <!-- Form -->
