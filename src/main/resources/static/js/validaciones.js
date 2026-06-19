@@ -38,8 +38,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // 2. Fechas no mayores a hoy
+        // 2. Fechas no mayores a hoy (excepto fechas de vencimiento)
         form.querySelectorAll('input[type="date"]').forEach(field => {
+            const nombreCampo = ((field.name || '') + (field.id || '')).toLowerCase();
+            const esVencimiento = nombreCampo.includes('vencimiento');
+            if (esVencimiento) return; // las fechas de vencimiento sí pueden ser futuras
+
             if (field.value) {
                 const fechaIngresada = new Date(field.value + 'T00:00:00');
                 if (fechaIngresada > hoy) {
@@ -131,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const msg = document.createElement('div');
                     msg.className = 'alert alert-danger mt-2';
                     msg.style.fontSize = '13px';
-                    msg.textContent = '⚠️ Debe ingresar el peso de al menos un saco.';
+                    msg.textContent = 'Debe ingresar el peso de al menos un saco.';
                     grid.parentNode.insertBefore(msg, grid.nextSibling);
                     valido = false;
                 }
@@ -156,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // 11. Confirmación antes de guardar ✨
+        // 11. Confirmación antes de guardar
         const btnSubmit = form.querySelector('button[type="submit"]');
         if (btnSubmit && !btnSubmit.getAttribute('data-confirmado')) {
             e.preventDefault();
@@ -192,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         Revisar
                     </button>
                     <button id="btnConfirmarModal" style="background:#2d5a27; color:white; border:none; border-radius:8px; padding:10px 24px; font-size:13px; cursor:pointer; font-weight:600;">
-                        ✅ Sí, guardar
+                        Sí, guardar
                     </button>
                 </div>
             </div>
