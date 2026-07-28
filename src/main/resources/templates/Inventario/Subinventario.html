@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${bodega.nombre} + ' — Mundo Avena'">Subinventario — Mundo Avena</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --verde-oscuro: #1a2e1a;
+            --verde: #2d5a27;
+            --dorado: #b28c65;
+            --dorado-claro: #d4ad82;
+            --crema: #f5f0e8;
+            --blanco-calido: #fffdfa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse 70% 50% at 100% 0%, #efe3d0 0%, var(--crema) 55%), var(--crema);
+            display: flex; min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar { width: 226px; background: linear-gradient(180deg, #244a20, var(--verde-oscuro)); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .sidebar-logo-box { padding: 22px 18px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; }
+        .sidebar-logo { background: white; border-radius: 10px; padding: 7px 11px; margin-bottom: 7px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .sidebar-logo img { height: 28px; object-fit: contain; }
+        .sidebar-sistema { color: var(--dorado-claro); font-size: 9px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; }
+        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; color: rgba(255,255,255,0.72); font-size: 12.5px; font-weight: 500; text-decoration: none; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.07); color: white; border-left-color: var(--dorado); text-decoration: none; }
+        .sidebar-item.active { background: rgba(255,255,255,0.1); color: white; border-left-color: var(--dorado); font-weight: 600; }
+        .sidebar-item-icon { font-size: 15px; }
+        .sidebar-bottom { margin-top: auto; padding: 18px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-user { color: rgba(255,255,255,0.55); font-size: 11px; margin-bottom: 10px; }
+        .sidebar-logout { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: white; border-radius: 7px; padding: 8px 12px; font-size: 11px; font-weight: 600; width: 100%; cursor: pointer; transition: all 0.2s; }
+        .sidebar-logout:hover { background: rgba(255,255,255,0.16); }
+
+        /* MAIN */
+        .main-content { margin-left: 226px; flex: 1; padding: 34px 36px; }
+        .fade-in-up { opacity: 0; transform: translateY(14px); animation: entrar 0.55s cubic-bezier(.16,1,.3,1) forwards; }
+        @keyframes entrar { to { opacity: 1; transform: translateY(0); } }
+
+        /* HEADER */
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; animation-delay: 0.02s; }
+        .page-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, var(--dorado-claro), var(--dorado)); color: white; font-size: 9px; font-weight: 700; padding: 4px 13px; border-radius: 20px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; box-shadow: 0 3px 10px rgba(178,140,101,0.3); }
+        .page-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 25px; color: var(--verde-oscuro); margin-bottom: 3px; }
+        .page-sub { font-size: 13px; color: #a39c8f; }
+        .semana-selector { background: white; border: 1px solid #e5ddd0; border-radius: 20px; padding: 8px 18px; font-size: 12px; color: var(--verde); font-weight: 700; box-shadow: 0 2px 8px rgba(45,90,39,0.06); }
+        .semana-block-label { font-size: 10px; font-weight: 700; color: #b0a89a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .semana-controls { display: flex; align-items: center; gap: 10px; }
+        .btn-nueva-semana { background: var(--verde-oscuro); color: white; border: none; border-radius: 10px; padding: 10px 18px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: background 0.2s ease; opacity: 0.55; cursor: not-allowed; }
+
+        /* TABS DE BODEGA */
+        .bodega-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; animation-delay: 0.06s; }
+        .bodega-tab { background: white; border: none; border-radius: 20px; padding: 9px 17px; font-size: 12px; font-weight: 700; color: #a39c8f; text-decoration: none; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(26,46,26,0.04); transition: all 0.2s; }
+        .bodega-tab:hover { text-decoration: none; color: var(--verde); }
+        .bodega-tab.active { background: var(--verde-oscuro); color: white; box-shadow: 0 6px 16px rgba(26,46,26,0.2); }
+
+        /* KPIs */
+        .kpis-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi-card { background: var(--blanco-calido); border-radius: 16px; padding: 20px; box-shadow: 0 1px 2px rgba(26,46,26,0.04), 0 6px 20px rgba(26,46,26,0.05); opacity: 0; transform: translateY(14px); animation: entrar 0.55s cubic-bezier(.16,1,.3,1) forwards; }
+        .kpi-card:nth-child(1) { animation-delay: 0.12s; }
+        .kpi-card:nth-child(2) { animation-delay: 0.18s; }
+        .kpi-card:nth-child(3) { animation-delay: 0.24s; }
+        .kpi-valor { font-family: 'Fraunces', serif; font-size: 25px; font-weight: 600; color: var(--verde); margin-bottom: 4px; }
+        .kpi-label { font-size: 11px; color: #a39c8f; font-weight: 500; }
+        .kpi-card.alerta .kpi-valor { color: #c0392b; }
+
+        /* ACCIONES */
+        .acciones-bar { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; animation-delay: 0.28s; }
+        .btn-accion { border: none; border-radius: 10px; padding: 12px 20px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+        .btn-entrada { background: linear-gradient(135deg, var(--dorado-claro), var(--dorado)); color: white; box-shadow: 0 6px 16px rgba(178,140,101,0.3); }
+        .btn-salida { background: white; color: var(--verde-oscuro); border: 1.5px solid #e5ddd0 !important; }
+        .btn-categorias { background: var(--verde-oscuro); color: white; }
+        .btn-categorias:hover { background: var(--verde); }
+        .btn-accion[disabled] { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+        /* SECCION */
+        .seccion-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; animation-delay: 0.32s; }
+        .seccion-line { flex: 1; height: 1px; background: linear-gradient(90deg, #e0d8ce, transparent); }
+        .seccion-titulo { font-size: 11px; font-weight: 700; color: var(--dorado); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap; }
+
+        /* TABLA AGRUPADA */
+        .tabla-wrap { background: var(--blanco-calido); border-radius: 16px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(26,46,26,0.04), 0 6px 20px rgba(26,46,26,0.05); opacity: 0; transform: translateY(14px); animation: entrar 0.55s cubic-bezier(.16,1,.3,1) forwards; animation-delay: 0.36s; }
+        .tabla-wrap table { width: 100%; border-collapse: collapse; }
+        .tabla-wrap thead th { background: var(--verde-oscuro); color: rgba(255,255,255,0.65); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; text-align: left; }
+        .fila-categoria td { background: #f0ece1; font-size: 10.5px; font-weight: 800; color: var(--verde-oscuro); letter-spacing: 0.6px; text-transform: uppercase; padding: 9px 16px; }
+        .tabla-wrap tbody td { font-size: 12.5px; color: #4a473f; padding: 10px 16px; border-bottom: 1px solid #f5f0e8; }
+        .tabla-wrap tbody tr:not(.fila-categoria):hover td { background: #faf7f2; }
+        .badge-estado { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .badge-activo { background: #f0f7ee; color: var(--verde); }
+        .badge-saldo-bajo { background: #fff8e1; color: #a67c00; }
+        .badge-agotado { background: #fdecea; color: #c0392b; }
+        .sin-registros { text-align: center; color: #ccc; padding: 24px; font-size: 12px; }
+
+        /* RESUMEN SIN LOTES (Cáscara) */
+        .resumen-simple { background: var(--blanco-calido); border-radius: 16px; padding: 36px; text-align: center; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(26,46,26,0.04), 0 6px 20px rgba(26,46,26,0.05); }
+        .resumen-simple-valor { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; color: var(--verde); margin-bottom: 6px; }
+        .resumen-simple-label { font-size: 12px; color: #a39c8f; }
+
+        /* MODAL DE CATEGORIAS */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,46,26,0.45); z-index: 200; align-items: center; justify-content: center; }
+        .modal-overlay.abierto { display: flex; }
+        .modal-box { background: var(--blanco-calido); border-radius: 18px; padding: 26px; width: 420px; max-width: 92vw; box-shadow: 0 24px 60px rgba(26,46,26,0.3); }
+        .modal-titulo { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; color: var(--verde-oscuro); margin-bottom: 4px; }
+        .modal-aviso { font-size: 11px; color: #a67c00; background: #fff8e1; border-radius: 8px; padding: 8px 12px; margin: 12px 0 16px; }
+        .modal-lista { list-style: none; margin-bottom: 16px; max-height: 220px; overflow-y: auto; }
+        .modal-lista li { display: flex; justify-content: space-between; align-items: center; padding: 9px 4px; border-bottom: 1px solid #f0ece1; font-size: 13px; color: var(--verde-oscuro); font-weight: 600; }
+        .btn-eliminar-cat { border: none; background: #fdecea; color: #c0392b; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .btn-eliminar-cat:hover { background: #f8d1cd; }
+        .modal-form { display: flex; gap: 8px; margin-bottom: 18px; }
+        .modal-input { flex: 1; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 9px 12px; font-size: 12.5px; font-family: 'Inter', sans-serif; }
+        .modal-input:focus { outline: none; border-color: var(--verde); }
+        .btn-agregar-cat { background: var(--verde-oscuro); color: white; border: none; border-radius: 8px; padding: 0 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .btn-agregar-cat:hover { background: var(--verde); }
+        .btn-cerrar-modal { width: 100%; background: transparent; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 9px; font-size: 12px; font-weight: 700; color: var(--verde-oscuro); cursor: pointer; }
+        .btn-cerrar-modal:hover { background: #f5f0e8; }
+
+        @media (max-width: 760px) { .kpis-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-logo-box">
+        <div class="sidebar-logo">
+            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+        </div>
+        <div class="sidebar-sistema">Control de Insumos</div>
+    </div>
+
+    <a href="/inventario/grano" class="sidebar-item">
+        <span class="sidebar-item-icon">🌾</span> Grano (Silos)
+    </a>
+    <a th:each="b : ${todasLasBodegas}"
+       th:href="@{'/inventario/subinventario/' + ${b.slug}}"
+       th:classappend="${b.slug == bodega.slug} ? ' active' : ''"
+       class="sidebar-item">
+        <span class="sidebar-item-icon" th:text="${b.icono}"></span>
+        <span th:text="${b.nombre}"></span>
+    </a>
+
+    <div class="sidebar-bottom">
+        <div class="sidebar-user">
+            👤 <span th:text="${usuario != null ? usuario.nombreCompleto : 'Inventario'}">Inventario</span>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="sidebar-logout">Cerrar Sesión</button>
+        </form>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+    <div class="page-header fade-in-up">
+        <div>
+            <div class="page-badge">📦 Inventario</div>
+            <div class="page-title" th:text="${bodega.icono} + ' ' + ${bodega.nombre}"></div>
+            <div class="page-sub">Subinventario</div>
+        </div>
+        <div>
+            <div class="semana-block-label">Semana</div>
+            <div class="semana-controls">
+                <div class="semana-selector">🗓️ <span th:text="${semanaActual}"></span></div>
+                <button class="btn-nueva-semana" disabled title="Disponible en la próxima entrega">+ Nueva semana</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bodega-tabs fade-in-up">
+        <a th:each="b : ${todasLasBodegas}"
+           th:href="@{'/inventario/subinventario/' + ${b.slug}}"
+           th:classappend="${b.slug == bodega.slug} ? ' active' : ''"
+           class="bodega-tab">
+            <span th:text="${b.icono}"></span> <span th:text="${b.nombre}"></span>
+        </a>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpis-grid">
+        <div class="kpi-card">
+            <div class="kpi-valor" th:text="${bodega.lotesActivos}"></div>
+            <div class="kpi-label">Lotes activos</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-valor" th:text="${bodega.saldoTotalFmt}"></div>
+            <div class="kpi-label">Saldo total</div>
+        </div>
+        <div class="kpi-card" th:classappend="${bodega.alertaBajo} ? ' alerta' : ''">
+            <div class="kpi-valor" th:text="${bodega.alertaBajo} ? '⚠️ Sí' : '✅ No'"></div>
+            <div class="kpi-label">Alertas de saldo bajo</div>
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="acciones-bar">
+        <button class="btn-accion btn-entrada" disabled title="Disponible en la próxima entrega">➕ Registrar Entrada</button>
+        <button class="btn-accion btn-salida" disabled title="Disponible en la próxima entrega">➖ Registrar Salida</button>
+        <button class="btn-accion btn-categorias" onclick="abrirModalCategorias()" th:if="${bodega.tipoAgrupacion == 'categoria'}">🗂️ Gestionar categorías</button>
+    </div>
+
+    <!-- CASO CON LOTES -->
+    <div th:if="${bodega.manejaLotes}">
+        <div class="seccion-header">
+            <div class="seccion-line"></div>
+            <div class="seccion-titulo">
+                📦 Lotes<span th:if="${bodega.tipoAgrupacion == 'categoria'}"> por categoría</span><span th:if="${bodega.tipoAgrupacion == 'ubicacion'}"> por ubicación</span> — <span th:text="${semanaActual}"></span>
+            </div>
+            <div class="seccion-line"></div>
+        </div>
+        <div class="tabla-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Lote</th>
+                    <th>Producto</th>
+                    <th>Cant. Inicial</th>
+                    <th>Entradas</th>
+                    <th>Salidas</th>
+                    <th>Saldo</th>
+                    <th>Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#maps.isEmpty(lotesPorCategoria)}">
+                    <td colspan="7" class="sin-registros">No hay lotes registrados esta semana</td>
+                </tr>
+                <th:block th:each="entrada : ${lotesPorCategoria}">
+                    <tr class="fila-categoria" th:unless="${bodega.tipoAgrupacion == 'plana'}">
+                        <td colspan="7" th:text="${entrada.key}"></td>
+                    </tr>
+                    <tr th:each="l : ${entrada.value}">
+                        <td th:text="${l.numeroLote}"></td>
+                        <td th:text="${l.producto}"></td>
+                        <td th:text="${#numbers.formatDecimal(l.cantidadInicial, 0, 'COMMA', 0, 'POINT')} + ' ' + ${l.unidad}"></td>
+                        <td th:text="${#numbers.formatDecimal(l.entradas, 0, 'COMMA', 0, 'POINT')} + ' ' + ${l.unidad}"></td>
+                        <td th:text="${#numbers.formatDecimal(l.salidas, 0, 'COMMA', 0, 'POINT')} + ' ' + ${l.unidad}"></td>
+                        <td th:text="${#numbers.formatDecimal(l.saldoActual, 0, 'COMMA', 0, 'POINT')} + ' ' + ${l.unidad}"></td>
+                        <td>
+                            <span th:if="${l.estado.name() == 'ACTIVO'}" class="badge-estado badge-activo">Activo</span>
+                            <span th:if="${l.estado.name() == 'SALDO_BAJO'}" class="badge-estado badge-saldo-bajo">Saldo bajo</span>
+                            <span th:if="${l.estado.name() == 'AGOTADO'}" class="badge-estado badge-agotado">Agotado</span>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CASO SIN LOTES (Cáscara) -->
+    <div th:unless="${bodega.manejaLotes}">
+        <div class="seccion-header">
+            <div class="seccion-line"></div>
+            <div class="seccion-titulo">📋 Resumen semanal (sin lotes)</div>
+            <div class="seccion-line"></div>
+        </div>
+        <div class="resumen-simple">
+            <div class="resumen-simple-valor" th:text="${bodega.saldoTotalFmt}"></div>
+            <div class="resumen-simple-label">Saldo acumulado — <span th:text="${semanaActual}"></span></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL: GESTIONAR CATEGORIAS -->
+<div class="modal-overlay" id="modalCategorias">
+    <div class="modal-box">
+        <div class="modal-titulo">🗂️ Categorías de producto</div>
+        <div class="modal-aviso">⚠️ Vista previa: los cambios aquí no se guardan todavía. Se conectarán al catálogo real en la próxima entrega.</div>
+
+        <ul class="modal-lista" id="listaCategorias"></ul>
+
+        <div class="modal-form">
+            <input type="text" class="modal-input" id="nuevaCategoriaInput" placeholder="Nombre de la nueva categoría">
+            <button class="btn-agregar-cat" onclick="agregarCategoria()">+ Agregar</button>
+        </div>
+
+        <button class="btn-cerrar-modal" onclick="cerrarModalCategorias()">Cerrar</button>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    let categorias = [/*[[${lotesPorCategoria != null ? lotesPorCategoria.keySet() : {}}]]*/ ["Avena Mosh", "Bobina Mosh Quaquer", "Bobina Avena para Frescos", "Rico Mosh"]]
+        .filter(c => c !== "__plana__");
+
+    function renderCategorias() {
+        const lista = document.getElementById('listaCategorias');
+        lista.innerHTML = '';
+        categorias.forEach((cat, i) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<span>${cat}</span><button class="btn-eliminar-cat" onclick="eliminarCategoria(${i})">✕</button>`;
+            lista.appendChild(li);
+        });
+    }
+
+    function abrirModalCategorias() {
+        renderCategorias();
+        document.getElementById('modalCategorias').classList.add('abierto');
+    }
+
+    function cerrarModalCategorias() {
+        document.getElementById('modalCategorias').classList.remove('abierto');
+    }
+
+    function agregarCategoria() {
+        const input = document.getElementById('nuevaCategoriaInput');
+        const valor = input.value.trim();
+        if (valor === '') return;
+        categorias.push(valor);
+        input.value = '';
+        renderCategorias();
+    }
+
+    function eliminarCategoria(indice) {
+        categorias.splice(indice, 1);
+        renderCategorias();
+    }
+</script>
+</body>
+</html>

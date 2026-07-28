@@ -16,6 +16,8 @@ public class CustomSuccessHandler implements AuthenticationSuccessHandler {
             response.sendRedirect("/admin/dashboard");
         } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_GERENCIA"))) {
             response.sendRedirect("/gerencia/dashboard");
+        } else if (authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_INVENTARIO"))) {
+            response.sendRedirect("/inventario/grano");
         } else {
             response.sendRedirect("/empleado/dashboard");
         }

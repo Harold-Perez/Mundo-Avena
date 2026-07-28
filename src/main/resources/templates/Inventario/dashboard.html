@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Inventario — Mundo Avena</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --verde-oscuro: #1a2e1a;
+            --verde: #2d5a27;
+            --verde-suave: #3d6f36;
+            --dorado: #b28c65;
+            --dorado-claro: #d4ad82;
+            --crema: #f5f0e8;
+            --blanco-calido: #fffdfa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse 70% 50% at 100% 0%, #efe3d0 0%, var(--crema) 55%),
+                        var(--crema);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar { width: 226px; background: linear-gradient(180deg, #244a20, var(--verde-oscuro)); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+        .sidebar-logo-box { padding: 22px 18px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; }
+        .sidebar-logo { background: white; border-radius: 10px; padding: 7px 11px; margin-bottom: 7px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .sidebar-logo img { height: 28px; object-fit: contain; }
+        .sidebar-sistema { color: var(--dorado-claro); font-size: 9px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; }
+        .sidebar-menu-label { color: rgba(255,255,255,0.32); font-size: 9px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; padding: 0 18px; margin-bottom: 6px; }
+        .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; color: rgba(255,255,255,0.72); font-size: 12.5px; font-weight: 500; text-decoration: none; border-left: 3px solid transparent; transition: all 0.2s; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.07); color: white; border-left-color: var(--dorado); text-decoration: none; }
+        .sidebar-item.active { background: rgba(255,255,255,0.1); color: white; border-left-color: var(--dorado); font-weight: 600; }
+        .sidebar-item-icon { font-size: 15px; }
+        .sidebar-bottom { margin-top: auto; padding: 18px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-user { color: rgba(255,255,255,0.55); font-size: 11px; margin-bottom: 10px; }
+        .sidebar-logout { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: white; border-radius: 7px; padding: 8px 12px; font-size: 11px; font-weight: 600; width: 100%; cursor: pointer; transition: all 0.2s; }
+        .sidebar-logout:hover { background: rgba(255,255,255,0.16); }
+
+        /* MAIN */
+        .main-content { margin-left: 226px; flex: 1; padding: 34px 36px; }
+
+        .fade-in-up { opacity: 0; transform: translateY(14px); animation: entrar 0.55s cubic-bezier(.16,1,.3,1) forwards; }
+        @keyframes entrar { to { opacity: 1; transform: translateY(0); } }
+
+        /* HEADER */
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; animation-delay: 0.02s; }
+        .page-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, var(--dorado-claro), var(--dorado)); color: white; font-size: 9px; font-weight: 700; padding: 4px 13px; border-radius: 20px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; box-shadow: 0 3px 10px rgba(178,140,101,0.3); }
+        .page-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 27px; color: var(--verde-oscuro); margin-bottom: 3px; letter-spacing: -0.3px; }
+        .page-sub { font-size: 13px; color: #a39c8f; }
+        .semana-selector { background: white; border: 1px solid #e5ddd0; border-radius: 20px; padding: 8px 18px; font-size: 12px; color: var(--verde); font-weight: 700; box-shadow: 0 2px 8px rgba(45,90,39,0.06); }
+
+        /* GRANO DESTACADO */
+        .grano-card {
+            background: linear-gradient(140deg, #2d5a27 0%, #1a2e1a 100%);
+            border-radius: 20px; padding: 26px 28px; margin-bottom: 32px; color: white;
+            box-shadow: 0 16px 40px rgba(26,46,26,0.22);
+            position: relative; overflow: hidden;
+            animation-delay: 0.08s;
+        }
+        .grano-card::after {
+            content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(178,140,101,0.18), transparent 70%);
+            border-radius: 50%;
+        }
+        .grano-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; position: relative; }
+        .grano-card-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 9px; }
+        .grano-card-link { color: var(--dorado-claro); font-size: 11.5px; font-weight: 700; text-decoration: none; transition: gap 0.2s ease; }
+        .grano-card-link:hover { color: white; }
+        .silos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; position: relative; }
+        .silo-box { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px 20px; backdrop-filter: blur(4px); }
+        .silo-nombre { font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 7px; font-weight: 500; }
+        .silo-cantidad { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 600; margin-bottom: 11px; }
+        .silo-bar-track { background: rgba(255,255,255,0.14); border-radius: 20px; height: 8px; overflow: hidden; margin-bottom: 6px; }
+        .silo-bar-fill { background: linear-gradient(90deg, var(--dorado), var(--dorado-claro)); height: 100%; border-radius: 20px; transition: width 0.8s cubic-bezier(.16,1,.3,1); }
+        .silo-pct { font-size: 10.5px; color: rgba(255,255,255,0.55); }
+
+        /* SECCION */
+        .seccion-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; animation-delay: 0.16s; }
+        .seccion-line { flex: 1; height: 1px; background: linear-gradient(90deg, #e0d8ce, transparent); }
+        .seccion-titulo { font-size: 11px; font-weight: 700; color: var(--dorado); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+
+        /* TARJETAS SUBINVENTARIO */
+        .subinv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .subinv-card {
+            background: var(--blanco-calido); border-radius: 16px; padding: 22px;
+            text-decoration: none; position: relative; overflow: hidden;
+            box-shadow: 0 1px 2px rgba(26,46,26,0.04), 0 6px 20px rgba(26,46,26,0.05);
+            transition: transform 0.3s cubic-bezier(.16,1,.3,1), box-shadow 0.3s ease;
+            opacity: 0; transform: translateY(14px);
+            animation: entrar 0.55s cubic-bezier(.16,1,.3,1) forwards;
+        }
+        .subinv-card:nth-child(1) { animation-delay: 0.24s; }
+        .subinv-card:nth-child(2) { animation-delay: 0.30s; }
+        .subinv-card:nth-child(3) { animation-delay: 0.36s; }
+        .subinv-card:nth-child(4) { animation-delay: 0.42s; }
+        .subinv-card:nth-child(5) { animation-delay: 0.48s; }
+        .subinv-card:hover { transform: translateY(-5px); box-shadow: 0 18px 36px rgba(45,90,39,0.13); }
+        .subinv-icon-badge {
+            width: 46px; height: 46px; border-radius: 13px; margin-bottom: 14px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+            background: linear-gradient(145deg, #eef4ec, #e2ecdd);
+            transition: transform 0.3s cubic-bezier(.16,1,.3,1);
+        }
+        .subinv-card:hover .subinv-icon-badge { transform: scale(1.1) rotate(-5deg); }
+        .subinv-nombre { font-size: 13.5px; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 14px; letter-spacing: 0.2px; }
+        .subinv-kpis { display: flex; justify-content: space-between; align-items: flex-end; }
+        .subinv-kpi-valor { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--verde); }
+        .subinv-kpi-label { font-size: 10.5px; color: #b0a89a; margin-top: 1px; }
+        .alerta-badge { position: absolute; top: 16px; right: 16px; background: #fdecea; color: #c0392b; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 3px; }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-logo-box">
+        <div class="sidebar-logo">
+            <img src="/img/logo-mundoavena.png" alt="Mundo Avena">
+        </div>
+        <div class="sidebar-sistema">Control de Insumos</div>
+    </div>
+
+    <div class="sidebar-menu-label">Inventario</div>
+    <a href="/inventario/dashboard" class="sidebar-item active">
+        <span class="sidebar-item-icon">📊</span> Dashboard General
+    </a>
+    <a href="/inventario/grano" class="sidebar-item">
+        <span class="sidebar-item-icon">🌾</span> Grano (Silos)
+    </a>
+    <a href="/inventario/subinventario/descascarado" class="sidebar-item">
+        <span class="sidebar-item-icon">🌰</span> Descascarado
+    </a>
+    <a href="/inventario/subinventario/cascara" class="sidebar-item">
+        <span class="sidebar-item-icon">🍂</span> Cáscara
+    </a>
+    <a href="/inventario/subinventario/bodega-b" class="sidebar-item">
+        <span class="sidebar-item-icon">🐄</span> Bodega B
+    </a>
+    <a href="/inventario/subinventario/harina-otw" class="sidebar-item">
+        <span class="sidebar-item-icon">🥣</span> Harina OTW
+    </a>
+    <a href="/inventario/subinventario/producto-terminado" class="sidebar-item">
+        <span class="sidebar-item-icon">📦</span> Producto Terminado
+    </a>
+
+    <div class="sidebar-bottom">
+        <div class="sidebar-user">
+            👤 <span th:text="${usuario != null ? usuario.nombreCompleto : 'Inventario'}">Inventario</span>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="sidebar-logout">Cerrar Sesión</button>
+        </form>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+    <div class="page-header fade-in-up">
+        <div>
+            <div class="page-badge">📦 Inventario</div>
+            <div class="page-title">Dashboard General</div>
+            <div class="page-sub">Resumen de todos los inventarios de la planta</div>
+        </div>
+        <div class="semana-selector">🗓️ <span th:text="${semanaActual}"></span></div>
+    </div>
+
+    <!-- Grano destacado -->
+    <div class="grano-card fade-in-up">
+        <div class="grano-card-header">
+            <div class="grano-card-title">🌾 Grano — Inventario Principal</div>
+            <a href="/inventario/grano" class="grano-card-link">Ver detalle →</a>
+        </div>
+        <div class="silos-grid">
+            <div class="silo-box" th:each="silo : ${silos}">
+                <div class="silo-nombre" th:text="${silo.nombre}"></div>
+                <div class="silo-cantidad" th:text="${#numbers.formatInteger(silo.saldoActualKg, 0, 'COMMA')} + ' kg'"></div>
+                <div class="silo-bar-track">
+                    <div class="silo-bar-fill" th:style="'width: ' + ${silo.porcentajeUso} + '%'"></div>
+                </div>
+                <div class="silo-pct" th:text="${silo.porcentajeUso} + '% de capacidad (600,000 kg)'"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subinventarios -->
+    <div class="seccion-header fade-in-up">
+        <div class="seccion-line"></div>
+        <div class="seccion-titulo">📋 Subinventarios</div>
+        <div class="seccion-line"></div>
+    </div>
+    <div class="subinv-grid">
+        <a th:each="b : ${subinventarios}"
+           th:href="@{'/inventario/subinventario/' + ${b.slug}}"
+           class="subinv-card">
+            <span th:if="${b.alertaBajo}" class="alerta-badge">⚠️ Saldo bajo</span>
+            <div class="subinv-icon-badge" th:text="${b.icono}"></div>
+            <div class="subinv-nombre" th:text="${b.nombre}"></div>
+            <div class="subinv-kpis">
+                <div>
+                    <div class="subinv-kpi-valor" th:text="${b.lotesActivos}"></div>
+                    <div class="subinv-kpi-label">Lotes activos</div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="subinv-kpi-valor" th:text="${b.saldoTotalFmt}"></div>
+                    <div class="subinv-kpi-label">Saldo total</div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>
