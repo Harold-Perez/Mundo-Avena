@@ -24,7 +24,7 @@
             display: flex; min-height: 100vh;
         }
 
-        /* SIDEBAR (igual al dashboard) */
+        /* SIDEBAR */
         .sidebar { width: 226px; background: linear-gradient(180deg, #244a20, var(--verde-oscuro)); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
         .sidebar-logo-box { padding: 22px 18px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px; }
         .sidebar-logo { background: white; border-radius: 10px; padding: 7px 11px; margin-bottom: 7px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
@@ -57,7 +57,7 @@
         .tab-btn { border: none; background: transparent; padding: 8px 18px; font-size: 12px; font-weight: 700; color: #a39c8f; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .tab-btn.active { background: var(--verde-oscuro); color: white; }
 
-        /* TARJETAS DE ESTADO: 2 silos + stock total */
+        /* TARJETAS DE ESTADO */
         .estado-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
         .estado-card { background: var(--blanco-calido); border-radius: 16px; padding: 22px; box-shadow: 0 1px 2px rgba(26,46,26,0.04), 0 6px 20px rgba(26,46,26,0.05); opacity: 0; transform: translateY(14px); animation: entrar 0.55s cubic-bezier(.16,1,.3,1) forwards; }
         .estado-card:nth-child(1) { animation-delay: 0.1s; }
@@ -82,7 +82,11 @@
         .btn-accion { border: none; border-radius: 10px; padding: 12px 22px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .btn-entrada { background: linear-gradient(135deg, var(--dorado-claro), var(--dorado)); color: white; box-shadow: 0 6px 16px rgba(178,140,101,0.3); }
         .btn-salida { background: white; color: var(--verde-oscuro); border: 1.5px solid #e5ddd0 !important; }
-        .btn-accion[disabled] { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+        /* MENSAJES FLASH */
+        .alerta-flash { border-radius: 10px; padding: 12px 16px; font-size: 12.5px; font-weight: 600; margin-bottom: 18px; }
+        .alerta-exito { background: #f0f7ee; color: var(--verde); }
+        .alerta-error { background: #fdecea; color: #c0392b; }
 
         /* SECCION */
         .seccion-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; animation-delay: 0.3s; }
@@ -112,6 +116,20 @@
         .sub-mini-nombre { font-size: 11.5px; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 3px; }
         .sub-mini-valor { font-size: 11px; color: #a39c8f; }
 
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,46,26,0.45); z-index: 200; align-items: center; justify-content: center; }
+        .modal-overlay.abierto { display: flex; }
+        .modal-box { background: var(--blanco-calido); border-radius: 18px; padding: 26px; width: 420px; max-width: 92vw; box-shadow: 0 24px 60px rgba(26,46,26,0.3); }
+        .modal-titulo { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; color: var(--verde-oscuro); margin-bottom: 16px; }
+        .modal-campo { margin-bottom: 14px; }
+        .modal-label { display: block; font-size: 11px; font-weight: 700; color: #a39c8f; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .modal-input, .modal-select { width: 100%; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: 'Inter', sans-serif; }
+        .modal-input:focus, .modal-select:focus { outline: none; border-color: var(--verde); }
+        .modal-acciones { display: flex; gap: 10px; margin-top: 18px; }
+        .btn-modal-cancelar { flex: 1; background: transparent; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 10px; font-size: 12px; font-weight: 700; color: var(--verde-oscuro); cursor: pointer; }
+        .btn-modal-guardar { flex: 1; background: var(--verde-oscuro); color: white; border: none; border-radius: 8px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .btn-modal-guardar:hover { background: var(--verde); }
+
         @media (max-width: 1000px) {
             .estado-grid { grid-template-columns: 1fr; }
             .sub-grid { grid-template-columns: repeat(2, 1fr); }
@@ -129,7 +147,6 @@
         <div class="sidebar-sistema">Control de Insumos</div>
     </div>
 
-    <div class="sidebar-menu-label">Inventario</div>
     <a href="/inventario/grano" class="sidebar-item active">
         <span class="sidebar-item-icon">🌾</span> Grano (Silos)
     </a>
@@ -168,7 +185,11 @@
             <div class="semana-block-label">Semana</div>
             <div class="semana-controls">
                 <div class="semana-select">🗓️ <span th:text="${semanaActual}"></span> ▾</div>
-                <button class="btn-nueva-semana" title="Disponible en la próxima entrega" disabled>+ Nueva semana</button>
+                <form th:action="@{/inventario/nueva-semana}" method="post"
+                      onsubmit="return confirm('¿Seguro que querés cerrar esta semana y crear una nueva? Los saldos actuales se arrastrarán automáticamente.');">
+                    <input type="hidden" name="volverA" value="/inventario/grano">
+                    <button type="submit" class="btn-nueva-semana">+ Nueva semana</button>
+                </form>
             </div>
         </div>
         <div class="tabs">
@@ -176,6 +197,10 @@
             <button class="tab-btn" onclick="mostrarTab('lotes', this)">Detalle por lotes</button>
         </div>
     </div>
+
+    <!-- Mensajes flash -->
+    <div th:if="${exito}" class="alerta-flash alerta-exito" th:text="${exito}"></div>
+    <div th:if="${error}" class="alerta-flash alerta-error" th:text="${error}"></div>
 
     <!-- VISTA: RESUMEN -->
     <div id="tab-resumen">
@@ -208,8 +233,8 @@
 
         <!-- Acciones -->
         <div class="acciones-bar">
-            <button class="btn-accion btn-entrada" disabled title="Disponible en la próxima entrega">➕ Registrar Entrada</button>
-            <button class="btn-accion btn-salida" disabled title="Disponible en la próxima entrega">➖ Registrar Salida</button>
+            <button class="btn-accion btn-entrada" onclick="abrirModalMovimiento('ENTRADA')">➕ Registrar Entrada</button>
+            <button class="btn-accion btn-salida" onclick="abrirModalMovimiento('SALIDA')">➖ Registrar Salida</button>
         </div>
 
         <!-- Movimientos recientes -->
@@ -307,12 +332,64 @@
 
 </div>
 
+<!-- MODAL: REGISTRAR MOVIMIENTO -->
+<div class="modal-overlay" id="modalMovimiento">
+    <div class="modal-box">
+        <div class="modal-titulo" id="modalMovimientoTitulo">Registrar Entrada</div>
+        <form th:action="@{/inventario/movimiento}" method="post">
+            <input type="hidden" name="tipo" id="campoTipo">
+
+            <div class="modal-campo">
+                <label class="modal-label">Silo</label>
+                <select name="productoId" class="modal-select" required>
+                    <option th:each="p : ${productosGroat}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                    <option th:each="p : ${productosAvena}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                </select>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Número de contenedor</label>
+                <input type="text" name="numeroLote" class="modal-input" placeholder="Ej. C-045" required>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Cantidad (kg)</label>
+                <input type="number" name="cantidad" class="modal-input" step="0.01" min="0.01" required>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Ticket báscula</label>
+                <input type="text" name="ticketBascula" class="modal-input" placeholder="Ej. 4821">
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Fecha</label>
+                <input type="date" name="fecha" class="modal-input">
+            </div>
+
+            <div class="modal-acciones">
+                <button type="button" class="btn-modal-cancelar" onclick="cerrarModalMovimiento()">Cancelar</button>
+                <button type="submit" class="btn-modal-guardar">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     function mostrarTab(nombre, btn) {
         document.getElementById('tab-resumen').style.display = nombre === 'resumen' ? 'block' : 'none';
         document.getElementById('tab-lotes').style.display = nombre === 'lotes' ? 'block' : 'none';
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+    }
+
+    function abrirModalMovimiento(tipo) {
+        document.getElementById('campoTipo').value = tipo;
+        document.getElementById('modalMovimientoTitulo').textContent = tipo === 'ENTRADA' ? 'Registrar Entrada' : 'Registrar Salida';
+        document.getElementById('modalMovimiento').classList.add('abierto');
+    }
+    function cerrarModalMovimiento() {
+        document.getElementById('modalMovimiento').classList.remove('abierto');
     }
 </script>
 </body>

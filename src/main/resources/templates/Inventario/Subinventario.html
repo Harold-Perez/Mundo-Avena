@@ -49,10 +49,12 @@
         .page-badge { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, var(--dorado-claro), var(--dorado)); color: white; font-size: 9px; font-weight: 700; padding: 4px 13px; border-radius: 20px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; box-shadow: 0 3px 10px rgba(178,140,101,0.3); }
         .page-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 25px; color: var(--verde-oscuro); margin-bottom: 3px; }
         .page-sub { font-size: 13px; color: #a39c8f; }
-        .semana-selector { background: white; border: 1px solid #e5ddd0; border-radius: 20px; padding: 8px 18px; font-size: 12px; color: var(--verde); font-weight: 700; box-shadow: 0 2px 8px rgba(45,90,39,0.06); }
+
         .semana-block-label { font-size: 10px; font-weight: 700; color: #b0a89a; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
         .semana-controls { display: flex; align-items: center; gap: 10px; }
-        .btn-nueva-semana { background: var(--verde-oscuro); color: white; border: none; border-radius: 10px; padding: 10px 18px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: background 0.2s ease; opacity: 0.55; cursor: not-allowed; }
+        .semana-selector { background: white; border: 1px solid #e5ddd0; border-radius: 20px; padding: 8px 18px; font-size: 12px; color: var(--verde); font-weight: 700; box-shadow: 0 2px 8px rgba(45,90,39,0.06); }
+        .btn-nueva-semana { background: var(--verde-oscuro); color: white; border: none; border-radius: 10px; padding: 9px 16px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: background 0.2s ease; }
+        .btn-nueva-semana:hover { background: var(--verde); }
 
         /* TABS DE BODEGA */
         .bodega-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; animation-delay: 0.06s; }
@@ -77,14 +79,18 @@
         .btn-salida { background: white; color: var(--verde-oscuro); border: 1.5px solid #e5ddd0 !important; }
         .btn-categorias { background: var(--verde-oscuro); color: white; }
         .btn-categorias:hover { background: var(--verde); }
-        .btn-accion[disabled] { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+        /* MENSAJES FLASH */
+        .alerta-flash { border-radius: 10px; padding: 12px 16px; font-size: 12.5px; font-weight: 600; margin-bottom: 18px; }
+        .alerta-exito { background: #f0f7ee; color: var(--verde); }
+        .alerta-error { background: #fdecea; color: #c0392b; }
 
         /* SECCION */
         .seccion-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; animation-delay: 0.32s; }
         .seccion-line { flex: 1; height: 1px; background: linear-gradient(90deg, #e0d8ce, transparent); }
         .seccion-titulo { font-size: 11px; font-weight: 700; color: var(--dorado); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap; }
 
-        /* TABLA AGRUPADA */
+        /* TABLA */
         .tabla-wrap { background: var(--blanco-calido); border-radius: 16px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 1px 2px rgba(26,46,26,0.04), 0 6px 20px rgba(26,46,26,0.05); opacity: 0; transform: translateY(14px); animation: entrar 0.55s cubic-bezier(.16,1,.3,1) forwards; animation-delay: 0.36s; }
         .tabla-wrap table { width: 100%; border-collapse: collapse; }
         .tabla-wrap thead th { background: var(--verde-oscuro); color: rgba(255,255,255,0.65); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 16px; text-align: left; }
@@ -102,19 +108,25 @@
         .resumen-simple-valor { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; color: var(--verde); margin-bottom: 6px; }
         .resumen-simple-label { font-size: 12px; color: #a39c8f; }
 
-        /* MODAL DE CATEGORIAS */
+        /* MODALES */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,46,26,0.45); z-index: 200; align-items: center; justify-content: center; }
         .modal-overlay.abierto { display: flex; }
         .modal-box { background: var(--blanco-calido); border-radius: 18px; padding: 26px; width: 420px; max-width: 92vw; box-shadow: 0 24px 60px rgba(26,46,26,0.3); }
-        .modal-titulo { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; color: var(--verde-oscuro); margin-bottom: 4px; }
-        .modal-aviso { font-size: 11px; color: #a67c00; background: #fff8e1; border-radius: 8px; padding: 8px 12px; margin: 12px 0 16px; }
+        .modal-titulo { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; color: var(--verde-oscuro); margin-bottom: 16px; }
+        .modal-campo { margin-bottom: 14px; }
+        .modal-label { display: block; font-size: 11px; font-weight: 700; color: #a39c8f; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .modal-input, .modal-select { width: 100%; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 10px 12px; font-size: 13px; font-family: 'Inter', sans-serif; }
+        .modal-input:focus, .modal-select:focus { outline: none; border-color: var(--verde); }
+        .modal-acciones { display: flex; gap: 10px; margin-top: 18px; }
+        .btn-modal-cancelar { flex: 1; background: transparent; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 10px; font-size: 12px; font-weight: 700; color: var(--verde-oscuro); cursor: pointer; }
+        .btn-modal-guardar { flex: 1; background: var(--verde-oscuro); color: white; border: none; border-radius: 8px; padding: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .btn-modal-guardar:hover { background: var(--verde); }
+        .modal-aviso { font-size: 11px; color: #a67c00; background: #fff8e1; border-radius: 8px; padding: 8px 12px; margin-bottom: 16px; }
         .modal-lista { list-style: none; margin-bottom: 16px; max-height: 220px; overflow-y: auto; }
         .modal-lista li { display: flex; justify-content: space-between; align-items: center; padding: 9px 4px; border-bottom: 1px solid #f0ece1; font-size: 13px; color: var(--verde-oscuro); font-weight: 600; }
         .btn-eliminar-cat { border: none; background: #fdecea; color: #c0392b; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: 12px; }
         .btn-eliminar-cat:hover { background: #f8d1cd; }
         .modal-form { display: flex; gap: 8px; margin-bottom: 18px; }
-        .modal-input { flex: 1; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 9px 12px; font-size: 12.5px; font-family: 'Inter', sans-serif; }
-        .modal-input:focus { outline: none; border-color: var(--verde); }
         .btn-agregar-cat { background: var(--verde-oscuro); color: white; border: none; border-radius: 8px; padding: 0 16px; font-size: 12px; font-weight: 700; cursor: pointer; }
         .btn-agregar-cat:hover { background: var(--verde); }
         .btn-cerrar-modal { width: 100%; background: transparent; border: 1.5px solid #e5ddd0; border-radius: 8px; padding: 9px; font-size: 12px; font-weight: 700; color: var(--verde-oscuro); cursor: pointer; }
@@ -168,7 +180,11 @@
             <div class="semana-block-label">Semana</div>
             <div class="semana-controls">
                 <div class="semana-selector">🗓️ <span th:text="${semanaActual}"></span></div>
-                <button class="btn-nueva-semana" disabled title="Disponible en la próxima entrega">+ Nueva semana</button>
+                <form th:action="@{/inventario/nueva-semana}" method="post"
+                      th:onsubmit="return confirm('¿Seguro que querés cerrar esta semana y crear una nueva? Los saldos actuales se arrastrarán automáticamente.');">
+                    <input type="hidden" name="volverA" th:value="@{'/inventario/subinventario/' + ${bodega.slug}}">
+                    <button type="submit" class="btn-nueva-semana">+ Nueva semana</button>
+                </form>
             </div>
         </div>
     </div>
@@ -181,6 +197,10 @@
             <span th:text="${b.icono}"></span> <span th:text="${b.nombre}"></span>
         </a>
     </div>
+
+    <!-- Mensajes flash -->
+    <div th:if="${exito}" class="alerta-flash alerta-exito" th:text="${exito}"></div>
+    <div th:if="${error}" class="alerta-flash alerta-error" th:text="${error}"></div>
 
     <!-- KPIs -->
     <div class="kpis-grid">
@@ -200,8 +220,8 @@
 
     <!-- Acciones -->
     <div class="acciones-bar">
-        <button class="btn-accion btn-entrada" disabled title="Disponible en la próxima entrega">➕ Registrar Entrada</button>
-        <button class="btn-accion btn-salida" disabled title="Disponible en la próxima entrega">➖ Registrar Salida</button>
+        <button class="btn-accion btn-entrada" onclick="abrirModalMovimiento('ENTRADA')" th:if="${bodega.manejaLotes}">➕ Registrar Entrada</button>
+        <button class="btn-accion btn-salida" onclick="abrirModalMovimiento('SALIDA')" th:if="${bodega.manejaLotes}">➖ Registrar Salida</button>
         <button class="btn-accion btn-categorias" onclick="abrirModalCategorias()" th:if="${bodega.tipoAgrupacion == 'categoria'}">🗂️ Gestionar categorías</button>
     </div>
 
@@ -269,25 +289,73 @@
 
 </div>
 
-<!-- MODAL: GESTIONAR CATEGORIAS -->
+<!-- MODAL: REGISTRAR MOVIMIENTO -->
+<div class="modal-overlay" id="modalMovimiento">
+    <div class="modal-box">
+        <div class="modal-titulo" id="modalMovimientoTitulo">Registrar Entrada</div>
+        <form th:action="@{/inventario/movimiento}" method="post">
+            <input type="hidden" name="tipo" id="campoTipo">
+
+            <div class="modal-campo">
+                <label class="modal-label">Producto</label>
+                <select name="productoId" class="modal-select" required>
+                    <option th:each="p : ${productos}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                </select>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Número de lote</label>
+                <input type="text" name="numeroLote" class="modal-input" placeholder="Ej. L-101" required>
+            </div>
+
+            <div class="modal-campo" th:if="${bodega.tipoAgrupacion == 'ubicacion'}">
+                <label class="modal-label">Ubicación</label>
+                <input type="text" name="ubicacion" class="modal-input" placeholder="Ej. Ubicación 1">
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Cantidad</label>
+                <input type="number" name="cantidad" class="modal-input" step="0.01" min="0.01" required>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Fecha</label>
+                <input type="date" name="fecha" class="modal-input">
+            </div>
+
+            <div class="modal-acciones">
+                <button type="button" class="btn-modal-cancelar" onclick="cerrarModalMovimiento()">Cancelar</button>
+                <button type="submit" class="btn-modal-guardar">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL: GESTIONAR CATEGORIAS (vista previa, no persiste todavía) -->
 <div class="modal-overlay" id="modalCategorias">
     <div class="modal-box">
         <div class="modal-titulo">🗂️ Categorías de producto</div>
         <div class="modal-aviso">⚠️ Vista previa: los cambios aquí no se guardan todavía. Se conectarán al catálogo real en la próxima entrega.</div>
-
         <ul class="modal-lista" id="listaCategorias"></ul>
-
         <div class="modal-form">
             <input type="text" class="modal-input" id="nuevaCategoriaInput" placeholder="Nombre de la nueva categoría">
             <button class="btn-agregar-cat" onclick="agregarCategoria()">+ Agregar</button>
         </div>
-
         <button class="btn-cerrar-modal" onclick="cerrarModalCategorias()">Cerrar</button>
     </div>
 </div>
 
 <script th:inline="javascript">
-    let categorias = [/*[[${lotesPorCategoria != null ? lotesPorCategoria.keySet() : {}}]]*/ ["Avena Mosh", "Bobina Mosh Quaquer", "Bobina Avena para Frescos", "Rico Mosh"]]
+    function abrirModalMovimiento(tipo) {
+        document.getElementById('campoTipo').value = tipo;
+        document.getElementById('modalMovimientoTitulo').textContent = tipo === 'ENTRADA' ? 'Registrar Entrada' : 'Registrar Salida';
+        document.getElementById('modalMovimiento').classList.add('abierto');
+    }
+    function cerrarModalMovimiento() {
+        document.getElementById('modalMovimiento').classList.remove('abierto');
+    }
+
+    let categorias = [/*[[${lotesPorCategoria != null ? lotesPorCategoria.keySet() : {}}]]*/ []]
         .filter(c => c !== "__plana__");
 
     function renderCategorias() {
@@ -299,16 +367,13 @@
             lista.appendChild(li);
         });
     }
-
     function abrirModalCategorias() {
         renderCategorias();
         document.getElementById('modalCategorias').classList.add('abierto');
     }
-
     function cerrarModalCategorias() {
         document.getElementById('modalCategorias').classList.remove('abierto');
     }
-
     function agregarCategoria() {
         const input = document.getElementById('nuevaCategoriaInput');
         const valor = input.value.trim();
@@ -317,7 +382,6 @@
         input.value = '';
         renderCategorias();
     }
-
     function eliminarCategoria(indice) {
         categorias.splice(indice, 1);
         renderCategorias();
