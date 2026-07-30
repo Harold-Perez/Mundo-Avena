@@ -43,7 +43,7 @@ public class DataInitializer implements CommandLineRunner {
         sembrarBodega("grano-groat", "Silo Groat", "🌾", true, "plana", 600_000L);
         sembrarBodega("grano-avena", "Silo Avena con Cáscara", "🌾", true, "plana", 600_000L);
         sembrarBodega("descascarado", "Descascarado", "🌰", true, "plana", null);
-        sembrarBodega("cascara", "Cáscara", "🍂", false, "sin-lotes", null);
+        sembrarBodega("cascara", "Cáscara", "🍂", true, "sin-lotes", null);
         sembrarBodega("bodega-b", "Bodega B", "🐄", true, "ubicacion", null);
         sembrarBodega("harina-otw", "Harina OTW", "🥣", true, "plana", null);
         sembrarBodega("producto-terminado", "Producto Terminado", "📦", true, "categoria", null);

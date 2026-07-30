@@ -18,7 +18,7 @@ public class Bodega {
     @Column(nullable = false)
     private String nombre;        // "Silo Groat", "Descascarado", etc.
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "NVARCHAR(10)")
     private String icono;
 
     @Column(nullable = false)

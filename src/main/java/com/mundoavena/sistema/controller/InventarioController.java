@@ -79,7 +79,7 @@ public class InventarioController {
         BodegaResumenDTO resumen = construirResumenBodega(bodega, semana);
         model.addAttribute("bodega", resumen);
         model.addAttribute("todasLasBodegas", construirBodegasResumen(semana));
-        model.addAttribute("lotesPorCategoria", bodega.isManejaLotes() ? agruparLotes(bodega, semana) : new LinkedHashMap<>());
+        model.addAttribute("lotesPorCategoria", !bodega.getTipoAgrupacion().equals("sin-lotes") ? agruparLotes(bodega, semana) : new LinkedHashMap<>());
         model.addAttribute("semanaActual", formatearSemana(semana));
         model.addAttribute("productos", productoRepository.findByBodegaAndActivoTrue(bodega));
 
