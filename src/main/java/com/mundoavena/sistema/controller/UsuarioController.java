@@ -62,9 +62,12 @@ public class UsuarioController {
     @PostMapping("/editar/{id}")
     public String actualizar(@PathVariable Long id,
                              @ModelAttribute Usuario usuario,
-                             @RequestParam(defaultValue = "false") boolean cambiarPassword,
                              RedirectAttributes redirectAttributes) {
-        usuarioService.actualizar(id, usuario, cambiarPassword);
+
+        System.out.println("ACTIVO = " + usuario.isActivo());
+
+        usuarioService.actualizar(id, usuario);
+
         redirectAttributes.addFlashAttribute("exito", "Usuario actualizado correctamente");
         return "redirect:/admin/usuarios";
     }

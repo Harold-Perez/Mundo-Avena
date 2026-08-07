@@ -29,7 +29,13 @@ public class MovimientoLote {
     private double cantidad;          // siempre positiva; el signo lo da el campo "tipo", no un número negativo
 
     @Column
+    private Double pesoKg;   // peso del movimiento en kg; null si esa bodega no lo usa (Grano)
+
+    @Column
     private String ticketBascula;     // solo aplica a Grano; null para las demás bodegas
+
+    @Column
+    private String motivo;   // solo aplica a movimientos tipo AJUSTE — por qué se corrigió el saldo
 
     @Column
     private String registradoPor;     // username de quien lo registró — para auditoría
@@ -43,6 +49,6 @@ public class MovimientoLote {
     }
 
     public enum TipoMovimiento {
-        ENTRADA, SALIDA
+        ENTRADA, SALIDA, AJUSTE
     }
 }

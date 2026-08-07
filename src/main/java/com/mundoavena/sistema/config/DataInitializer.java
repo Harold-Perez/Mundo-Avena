@@ -47,6 +47,7 @@ public class DataInitializer implements CommandLineRunner {
         sembrarBodega("bodega-b", "Bodega B", "🐄", true, "ubicacion", null);
         sembrarBodega("harina-otw", "Harina OTW", "🥣", true, "plana", null);
         sembrarBodega("producto-terminado", "Producto Terminado", "📦", true, "categoria", null);
+        sembrarBodega("materia-prima", "Materia Prima", "🏷️", true, "categoria", null);
     }
 
     private void sembrarBodega(String slug, String nombre, String icono, boolean manejaLotes, String tipoAgrupacion, Long capacidadKg) {
@@ -75,7 +76,7 @@ public class DataInitializer implements CommandLineRunner {
         sembrarProducto("descascarado", "Fibra", null, "sacos");
         sembrarProducto("descascarado", "Maxis Sacos", null, "sacos");
 
-        sembrarProducto("cascara", "Afrecho", null, "kg");
+        sembrarProducto("cascara", "Afrecho", null, "sacos");
 
         sembrarProducto("bodega-b", "Hojuela Mosh Consumo Animal", null, "sacos");
 
@@ -88,6 +89,53 @@ public class DataInitializer implements CommandLineRunner {
         sembrarProducto("producto-terminado", "Bobina 900 gramos", "Bobina Mosh Quaquer", "unidades");
         sembrarProducto("producto-terminado", "Bobina Avena Frescos 600g", "Bobina Avena para Frescos", "unidades");
         sembrarProducto("producto-terminado", "Rico Mosh", "Rico Mosh", "unidades");
+
+        // ---- Materia Prima (Material de Empaque) ----
+        sembrarProducto("materia-prima", "Bobina Avena Estrella 360 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Estrella 1 Kilo", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Mosh Empaque Antiguo 300 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Fortificada 454 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Crema de Avena 100 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Integral 300 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Integral 40 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobinas Transparentes PMA", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Mosh Roja 300 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Roja 40 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Perlada 165 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Steel Cut 40 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Mosh Empaque Antiguo Naranja 150 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Fortificada 300 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Fortificada 150 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina Avena Fortificada 40 Gramos", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobinas Transparentes No Funcional", "Bobinas", "kg");
+        sembrarProducto("materia-prima", "Bobina para Pruebas Transparente", "Bobinas", "kg");
+
+        sembrarProducto("materia-prima", "Sacos Blancos PMA", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Sacos Celestes Fondo Plano", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Sacos Azul Mix", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Sacos Estrella", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Sacos de Segunda de Afrecho", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Sacos Afrecho Blancos", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Sacos Maxi", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Sacos Blancos Laminados", "Sacos", "unidades");
+        sembrarProducto("materia-prima", "Saco Blanco Laminado 50 Libras", "Sacos", "unidades");
+
+        sembrarProducto("materia-prima", "Bolsas RTD", "Bolsas", "unidades");
+        sembrarProducto("materia-prima", "Bolsas para Arroz", "Bolsas", "unidades");
+
+        sembrarProducto("materia-prima", "Carbonato", "Vitamina", "unidades");
+        sembrarProducto("materia-prima", "Vitamina", "Vitamina", "unidades");
+
+        sembrarProducto("materia-prima", "Bobina Quaker", "Bobina Quaker 600g", "kg");
+        sembrarProducto("materia-prima", "Bobina Mosh Quaker", "Bobina Quaker 600g", "kg");
+        sembrarProducto("materia-prima", "Bobina para Frescos 600 Gramos", "Bobina Quaker 600g", "kg");
+
+        sembrarProducto("materia-prima", "Bobina Nutremas 1200 Gramos", "Bobina Quaker 1200g", "kg");
+
+        sembrarProducto("materia-prima", "Bobina Nutremas 900 Gramos", "Bobina Quaker 900g", "kg");
+
+        sembrarProducto("materia-prima", "Bobina Rico Mosh 360 Gramos", "Bobina Rico Mosh 360g", "kg");
+        sembrarProducto("materia-prima", "Bobina Nutremas 360 Gramos", "Bobina Rico Mosh 360g", "kg");
     }
 
     private void sembrarProducto(String slugBodega, String nombre, String categoria, String unidad) {

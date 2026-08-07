@@ -32,6 +32,12 @@ public class LoteSemana {
     @Column(nullable = false)
     private double saldoActual;     // se actualiza con cada MovimientoLote
 
+    @Column
+    private Double pesoInicialKg;   // null para Grano, donde no aplica esta doble unidad
+
+    @Column
+    private Double pesoActualKg;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoLote estado = EstadoLote.ACTIVO;

@@ -35,13 +35,13 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public Usuario actualizar(Long id, Usuario datos, boolean cambiarPassword) {
+    public Usuario actualizar(Long id, Usuario datos) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         usuario.setNombreCompleto(datos.getNombreCompleto());
         usuario.setRol(datos.getRol());
         usuario.setActivo(datos.isActivo());
-        if (cambiarPassword && datos.getPassword() != null && !datos.getPassword().isEmpty()) {
+        if (datos.getPassword() != null && !datos.getPassword().isBlank()) {
             usuario.setPassword(passwordEncoder.encode(datos.getPassword()));
         }
         return usuarioRepository.save(usuario);

@@ -166,6 +166,11 @@
         <span class="sidebar-item-icon">📦</span> Producto Terminado
     </a>
 
+    <a href="/inventario/subinventario/materia-prima" class="sidebar-item">
+        <span class="sidebar-item-icon">🏷️</span> Materia Prima
+    </a>
+
+
     <div class="sidebar-bottom">
         <div class="sidebar-user">
             👤 <span th:text="${usuario != null ? usuario.nombreCompleto : 'Inventario'}">Inventario</span>
@@ -235,6 +240,8 @@
         <div class="acciones-bar">
             <button class="btn-accion btn-entrada" onclick="abrirModalMovimiento('ENTRADA')">➕ Registrar Entrada</button>
             <button class="btn-accion btn-salida" onclick="abrirModalMovimiento('SALIDA')">➖ Registrar Salida</button>
+            <button class="btn-accion btn-salida" onclick="abrirModalAjuste()">⚖️ Ajustar Saldo</button>
+
         </div>
 
         <!-- Movimientos recientes -->
@@ -375,6 +382,51 @@
     </div>
 </div>
 
+<!-- MODAL: AJUSTAR SALDO (nuevo, va aquí) -->
+<div class="modal-overlay" id="modalAjuste">
+    <div class="modal-box">
+        <div class="modal-titulo">⚖️ Ajustar Saldo</div>
+        <div class="modal-aviso">Usá esto solo para corregir el saldo tras un conteo físico — no es una entrada ni una salida normal.</div>
+
+        <form th:action="@{/inventario/ajuste}" method="post">
+
+            <div class="modal-campo">
+                <label class="modal-label">Silo</label>
+                <select name="productoId" class="modal-select" required>
+                    <option th:each="p : ${productosGroat}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                    <option th:each="p : ${productosAvena}" th:value="${p.id}" th:text="${p.nombre}"></option>
+                </select>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Número de contenedor</label>
+                <input type="text" name="numeroLote" class="modal-input" placeholder="Ej. C-045" required>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Saldo real (kg, conteo físico)</label>
+                <input type="number" name="nuevoSaldo" class="modal-input" step="0.01" min="0" required>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Motivo del ajuste</label>
+                <input type="text" name="motivo" class="modal-input" placeholder="Ej. Diferencia en pesaje semanal" required>
+            </div>
+
+            <div class="modal-campo">
+                <label class="modal-label">Fecha</label>
+                <input type="date" name="fecha" class="modal-input">
+            </div>
+
+            <div class="modal-acciones">
+                <button type="button" class="btn-modal-cancelar" onclick="cerrarModalAjuste()">Cancelar</button>
+                <button type="submit" class="btn-modal-guardar">Guardar Ajuste</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
 <script>
     function mostrarTab(nombre, btn) {
         document.getElementById('tab-resumen').style.display = nombre === 'resumen' ? 'block' : 'none';
@@ -390,6 +442,13 @@
     }
     function cerrarModalMovimiento() {
         document.getElementById('modalMovimiento').classList.remove('abierto');
+    }
+
+    function abrirModalAjuste() {
+    document.getElementById('modalAjuste').classList.add('abierto');
+    }
+    function cerrarModalAjuste() {
+    document.getElementById('modalAjuste').classList.remove('abierto');
     }
 </script>
 </body>
